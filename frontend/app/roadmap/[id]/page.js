@@ -145,16 +145,9 @@ export default function RoadmapDetailPage() {
   )
 
   // ✅ SINGLE check AFTER hooks
-  if (status === 'loading') return null
-  if (status !== 'authenticated') return null
-
-  if (milestonesLoading || !roadmap) {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p>Loading roadmap...</p>
-    </div>
-  )
-}
+  if (status === 'loading') return null;
+if (status === 'unauthenticated') return null;
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
