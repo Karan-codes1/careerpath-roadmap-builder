@@ -24,11 +24,16 @@ const port = process.env.PORT || 8080;
 
 // ✅ CORS MUST BE FIRST
 app.use(cors({
-  
-  origin: "https://careerpath-roadmap-builder.vercel.app",
-  origin: "http://localhost:3000",
-  credentials: true
+  origin: [
+    "http://localhost:3000",
+    "https://careerpath-roadmap-builder.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-user-id"]
 }));
+
+app.options('*', cors());
 
 // ✅ Other middleware
 app.use(express.json());
