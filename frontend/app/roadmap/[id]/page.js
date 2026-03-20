@@ -25,7 +25,6 @@ const MilestoneCard = dynamic(() => import('@/components/MilestoneCard'), {
 export default function RoadmapDetailPage() {
   const { id } = useParams()
   const router = useRouter()
-
   const { data: session, status } = useSession()
 
   // ✅ Zustand store
@@ -49,16 +48,11 @@ export default function RoadmapDetailPage() {
   // 2️⃣ Fetch data only if authenticated
   useEffect(() => {
     if (!id || status !== 'authenticated') return
-
     setMilestonesLoading(true)
     fetchRoadmapDetails(id)
   }, [id, status, fetchRoadmapDetails])
 
-  // 3️⃣ Block render while checking auth
-  if (status === 'loading') return null
-
-
-  // ✅ Sync Zustand cache → local state
+  // ✅ FIX: moved BEFORE any return
   useEffect(() => {
     if (!cached) return
 
@@ -98,13 +92,11 @@ export default function RoadmapDetailPage() {
     const newProgress =
       total === 0 ? 0 : Math.round((completed / total) * 100)
 
-    // ✅ Update UI (optimistic)
     setMilestones(updatedMilestones)
     setProgress(newProgress)
     setCompletedMilestones(completed)
     setRemainingMilestones(total - completed)
 
-    // ✅ Update Zustand cache
     RoadmapDetailsStore.getState().setRoadmapData(id, {
       roadmap,
       milestones: updatedMilestones,
@@ -115,7 +107,6 @@ export default function RoadmapDetailPage() {
       },
     })
 
-    // ✅ Persist per-user progress
     const updatedStatus = updatedMilestones.find(
       (m) => m._id === milestoneId
     )?.status
@@ -126,7 +117,6 @@ export default function RoadmapDetailPage() {
     })
   }
 
-  // ✅ Skill badges
   const skillBadges = useMemo(
     () =>
       roadmap?.skills?.map((tag, index) => (
@@ -141,7 +131,6 @@ export default function RoadmapDetailPage() {
     [roadmap?.skills]
   )
 
-  // ✅ Milestone list
   const milestoneList = useMemo(
     () =>
       milestones.map((milestone, index) => (
@@ -155,8 +144,17 @@ export default function RoadmapDetailPage() {
     [milestones]
   )
 
+  // ✅ SINGLE check AFTER hooks
   if (status === 'loading') return null
   if (status !== 'authenticated') return null
+
+  if (milestonesLoading || !roadmap) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p>Loading roadmap...</p>
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen bg-gray-50">

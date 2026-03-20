@@ -24,7 +24,9 @@ const port = process.env.PORT || 8080;
 
 // ✅ CORS MUST BE FIRST
 app.use(cors({
+  
   origin: "https://careerpath-roadmap-builder.vercel.app",
+  origin: "http://localhost:3000",
   credentials: true
 }));
 
