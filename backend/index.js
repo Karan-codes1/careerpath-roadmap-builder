@@ -33,7 +33,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization", "x-user-id"]
 }));
 
-app.options('*', cors());
+
 
 // ✅ Other middleware
 app.use(express.json());
