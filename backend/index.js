@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+
 import AuthRouter from './routes/authRouter.js'
 import RoadmapRouter from './routes/RoadmapRouter.js'
 import MilestoneRouter from './routes/MilestoneRouter.js'
@@ -15,58 +16,37 @@ import QuizRouter from './routes/QuizRouter.js'
 import { connectDB } from './models/db.js';
 
 if (process.env.NODE_ENV !== "production") {
-    dotenv.config(); // only load .env locally
+    dotenv.config();
 }
 
-const app = express()
-const port = process.env.PORT || 8080 
+const app = express();
+const port = process.env.PORT || 8080;
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://careerpath-roadmap-builder.vercel.app"
-];
-
+// ✅ CORS MUST BE FIRST
 app.use(cors({
-  origin: (origin, callback) => {
-    // allow server-to-server / SSR / Postman
-    if (!origin) return callback(null, true);
-
-    // normalize origin (remove trailing slash)
-    const normalizedOrigin = origin.replace(/\/$/, "");
-
-    if (allowedOrigins.includes(normalizedOrigin)) {
-      return callback(null, true);
-    }
-
-    console.error("Blocked by CORS:", origin);
-    return callback(null, false); // block unknown origins
-  },
+  origin: "https://careerpath-roadmap-builder.vercel.app",
   credentials: true
 }));
 
+// ✅ Other middleware
+app.use(express.json());
+app.use(cookieParser());
 
-
-// Connect to MongoDB
+// ✅ Connect to DB
 await connectDB();
 
+// ✅ Routes
+app.use('/auth', AuthRouter);
+app.use('/roadmap', RoadmapRouter);
+app.use('/milestone', MilestoneRouter);
+app.use('/resource', ResourceRouter);
+app.use('/bookmarks', BookmarkRouter);
+app.use('/profile', ProfileRouter);
+app.use('/dashboard', DashboardRouter);
+app.use('/ai', AIRouter);
+app.use('/quiz', QuizRouter);
 
-//Routers
-
-app.use('/auth',AuthRouter)
-app.use('/roadmap',RoadmapRouter);
-app.use('/milestone',MilestoneRouter)
-app.use('/resource',ResourceRouter)
-app.use('/bookmarks',BookmarkRouter)
-app.use('/profile',ProfileRouter)
-app.use('/dashboard',DashboardRouter)
-app.use('/ai',AIRouter)
-app.use('/quiz',QuizRouter)
-
-
+// ✅ Start server
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Server running on port ${port}`);
+});
