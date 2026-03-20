@@ -27,7 +27,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://careerpath-frontend-ugih.vercel.app"
+  "https://careerpath-roadmap-builder.vercel.app"
 ];
 
 app.use(cors({
