@@ -27,9 +27,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
-      >
+     <body
+       className={`${inter.className} ${jetbrainsMono.variable} antialiased`}
+    >
         <ClientProviders>
           <Navbar />
           {children}
