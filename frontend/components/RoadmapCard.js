@@ -39,14 +39,6 @@ export default function RoadmapCard({
     }
   };
 
-  const handleStartLearning = () => {
-    if (status === "unauthenticated") {
-      router.push("/login?message=login_required");
-    } else {
-      router.push(`/roadmap/${_id}`);
-    }
-  };
-
   return (
     <Card className="h-full flex flex-col rounded-xl border hover:shadow-lg transition-shadow duration-200 group">
   
@@ -113,7 +105,6 @@ export default function RoadmapCard({
 
     {/* BUTTON — PINNED TO BOTTOM */}
     <button
-      onClick={handleStartLearning}
       className="mt-auto w-full flex items-center justify-center gap-2 text-white px-3 py-2 rounded-md text-sm transition-all hover:opacity-90"
       style={{ backgroundColor: "#030213" }}
     >
