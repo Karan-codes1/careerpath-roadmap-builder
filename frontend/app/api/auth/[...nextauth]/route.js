@@ -13,6 +13,7 @@ const handler = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
+    
 
     // 🔹 EMAIL + PASSWORD LOGIN
     CredentialsProvider({
@@ -58,6 +59,13 @@ const handler = NextAuth({
       },
     }),
   ],
+
+  
+  
+  
+  pages: {
+    signIn: "/login",
+  },
 
   // 🔹 JWT SESSION
   session: {

@@ -40,18 +40,23 @@ export default function RoadmapCard({
   };
 
   const handleStartLearning = () => {
-    if (status === "loading") return;
+  if (status === "loading") return;
 
-    if (status === "unauthenticated") {
-      router.push("/login?message=login_required");
-      return;
-    }
+  if (status === "unauthenticated") {
+    router.push(
+      `/login?callbackUrl=${encodeURIComponent(`/roadmap/${_id}`)}`
+    );
+    return;
+  }
 
-    router.push(`/roadmap/${_id}`);
-  };
+  router.push(`/roadmap/${_id}`);
+};
 
   return (
-    <Card className="h-full flex flex-col rounded-xl border hover:shadow-lg transition-shadow duration-200 group">
+    
+    <Card 
+    onClick={handleStartLearning}
+    className="h-full flex flex-col rounded-xl border hover:shadow-lg transition-shadow duration-200 group cursor-pointer">
   
   {/* HEADER */}
   <CardHeader className="pb-2 space-y-2">
@@ -116,7 +121,11 @@ export default function RoadmapCard({
 
     {/* BUTTON — PINNED TO BOTTOM */}
     <button
-      onClick={handleStartLearning}
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleStartLearning();
+      }}
       className="mt-auto w-full flex items-center justify-center gap-2 text-white px-3 py-3 my-2 rounded-md text-sm transition-all hover:opacity-90"
       style={{ backgroundColor: "#030213" }}
     >

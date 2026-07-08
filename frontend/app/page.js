@@ -125,17 +125,13 @@ function HomeContent() {
             ) : roadmaps.length > 0 ? (
               roadmaps.map((roadmap) => {
                 const IconComponent = iconMap[roadmap.icon?.toLowerCase()] || Code;
+
                 return (
-                  <Link
+                  <RoadmapCard
                     key={roadmap._id}
-                    href={`/roadmap/${roadmap._id}`}
-                    className="hover:shadow-lg transition-shadow"
-                  >
-                    <RoadmapCard
-                      {...roadmap}
-                      icon={<IconComponent className="w-6 h-6" />}
-                    />
-                  </Link>
+                    {...roadmap}
+                    icon={<IconComponent className="w-6 h-6" />}
+                  />
                 );
               })
             ) : (

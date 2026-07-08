@@ -4,10 +4,15 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+
 
 function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl =
+  searchParams.get("callbackUrl") || "/";   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,12 +28,13 @@ function LoginContent() {
       email,
       password,
       redirect: false,
+      callbackUrl,
     });
 
     if (res?.error) {
       setError("Invalid email or password");
     } else {
-      router.push("/");
+      router.push(res?.url || callbackUrl);
     }
 
     setLoading(false);
@@ -83,7 +89,7 @@ function LoginContent() {
 
         <button
           type="button"
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl })}
           className="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white text-gray-700 p-2 rounded hover:bg-gray-50 transition"
         >
           <img
