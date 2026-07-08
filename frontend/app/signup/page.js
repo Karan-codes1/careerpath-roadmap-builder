@@ -1,17 +1,16 @@
 'use client';
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import api from "@/utils/api";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SignupPage() {
+function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const callbackUrl =
-  searchParams.get("callbackUrl") || "/";
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,12 +26,12 @@ export default function SignupPage() {
     try {
       await api.post("/auth/signup", { name, email, password });
 
-     const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      callbackUrl,
-    });
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl,
+      });
 
       if (res?.error) {
         setError("Signup successful, but login failed");
@@ -52,7 +51,7 @@ export default function SignupPage() {
         onSubmit={handleSignup}
         className="bg-white p-6 w-96 rounded-xl shadow-md mb-20"
       >
-        <h2 className="text-2xl font-bold mb-4 text-center">Sign up</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
 
         {error && <p className="text-red-500 mb-3 text-sm">{error}</p>}
 
@@ -64,6 +63,7 @@ export default function SignupPage() {
         />
 
         <input
+          type="email"
           placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -71,8 +71,8 @@ export default function SignupPage() {
         />
 
         <input
-          placeholder="Password"
           type="password"
+          placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
           required
           className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -113,5 +113,12 @@ export default function SignupPage() {
       </form>
     </div>
   );
+}
 
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupContent />
+    </Suspense>
+  );
 }
