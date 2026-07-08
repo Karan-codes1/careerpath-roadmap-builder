@@ -75,21 +75,25 @@ const handler = NextAuth({
   callbacks: {
     // 🔹 CREATE USER ON GOOGLE LOGIN
     async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        await dbConnect();
+    if (account?.provider === "google") {
+      await dbConnect();
 
-        const exists = await User.findOne({ email: user.email });
+      let dbUser = await User.findOne({ email: user.email });
 
-        if (!exists) {
-          await User.create({
-            name: user.name,
-            email: user.email,
-            password: null,
-          });
-        }
+      if (!dbUser) {
+        dbUser = await User.create({
+          name: user.name,
+          email: user.email,
+          password: null,
+        });
       }
-      return true;
-    },
+
+      // replace Google's id with MongoDB id
+      user.id = dbUser._id.toString();
+    }
+
+    return true;
+   },
 
     // 🔹 ATTACH DATA TO JWT
     async jwt({ token, user }) {
