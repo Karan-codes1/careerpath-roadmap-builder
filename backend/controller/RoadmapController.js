@@ -63,8 +63,10 @@ export const createRoadmap = async (req, res) => {
 // GET All Roadmaps
 export const getAllRoadmaps = async (req, res) => {
   try {
-    const allroadmaps = await Roadmap.find().select(
-      "title description category icon duration difficulty learners skills"
+    const allroadmaps = await Roadmap.find()
+      .sort({ displayOrder: 1 })
+      .select(
+        "title description category icon duration difficulty learners skills"
     );
     return res.status(200).json({ allroadmaps });
   } catch (error) {

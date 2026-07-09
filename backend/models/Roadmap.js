@@ -13,6 +13,12 @@ const roadmapSchema = new mongoose.Schema(
       enum: ['Beginner', 'Intermediate', 'Advanced'], 
       default: 'Beginner' 
     },
+
+    displayOrder: {
+      type: Number,
+      default: 999,
+    },
+    
     learners: { type: Number, default: 0 },
 
     completionRate: { type: Number, default: 0 }, // 0 to 100 percent
