@@ -1,4 +1,4 @@
-# CareerPath — AI Powered Personalized Learning Platform
+# 🚀 CareerPath — AI Powered Personalized Learning Platform
 
 CareerPath is a full-stack AI-powered learning platform that helps aspiring developers follow structured career roadmaps, track learning progress, assess their knowledge through quizzes, receive AI-generated explanations for incorrect answers, generate personalized project ideas, and discover learning resources based on their weak areas.
 
@@ -6,7 +6,7 @@ Unlike traditional roadmap websites, CareerPath adapts to each learner by combin
 
 ---
 
-# Live Demo
+# 🌐 Live Demo
 
 ### Frontend
 https://careerpath-roadmap-builder.vercel.app
@@ -16,7 +16,7 @@ https://careerpath-backend-1.onrender.com
 
 ---
 
-# Features
+# ✨ Features
 
 ## Authentication
 
@@ -96,15 +96,15 @@ This creates an adaptive learning experience tailored to every user.
 ## Home Page
 
 <p align="center">
-<img src="screenshots/Home_Page.png" width="900">
+<img src="screenshots/home.png" width="900">
 </p>
 
 ---
 
-## Roadmaps
+## Career Roadmap
 
 <p align="center">
-<img src="screenshots/Roadmaps.png" width="900">
+<img src="screenshots/roadmap.png" width="900">
 </p>
 
 ---
@@ -112,11 +112,7 @@ This creates an adaptive learning experience tailored to every user.
 ## AI Project Generator
 
 <p align="center">
-<img src="screenshots/project_page.png" width="900">
-</p>
-
-<p align="center">
-<img src="screenshots/project_page_2.png" width="900">
+<img src="screenshots/project-generator.png" width="900">
 </p>
 
 ---
@@ -124,44 +120,44 @@ This creates an adaptive learning experience tailored to every user.
 ## Milestone Learning
 
 <p align="center">
-<img src="screenshots/Milestone.png" width="900">
+<img src="screenshots/milestone.png" width="900">
 </p>
 
 ---
 
-## Resources(Inside each Milestone)
+## 📝 Quiz
 
 <p align="center">
-<img src="screenshots/Resources.png" width="900">
+<img src="screenshots/quiz.png" width="900">
 </p>
 
 ---
 
-## Quiz
+## 📈 Quiz Results
 
 <p align="center">
-<img src="screenshots/Quiz.png" width="900">
+<img src="screenshots/result.png" width="900">
 </p>
 
 ---
 
-## Quiz Results
+## 📚 Personalized Resources
 
 <p align="center">
-<img src="screenshots/Quiz_Result.png" width="900">
+<img src="screenshots/resources.png" width="900">
 </p>
 
 ---
 
-## AI Explanation
+## 🧠 AI Explanation
 
 <p align="center">
-<img src="screenshots/AI_Explanation.png" width="900">
+<img src="screenshots/explanation.png" width="900">
 </p>
 
 ---
 
-# Tech Stack
+# 🛠 Tech Stack
 
 ## Frontend
 
@@ -196,7 +192,7 @@ This creates an adaptive learning experience tailored to every user.
 
 ---
 
-# Architecture
+# 🏗️ Architecture
 
 ```
                     User
@@ -221,7 +217,7 @@ AI Explanations   AI Projects   Personalized Resources
 
 ---
 
-# Folder Structure
+# 📂 Folder Structure
 
 ```
 CareerPath
@@ -247,7 +243,7 @@ CareerPath
 
 ---
 
-# AI Features
+# 🤖 AI Features
 
 CareerPath integrates Generative AI to create a personalized learning experience.
 
@@ -271,12 +267,12 @@ CareerPath integrates Generative AI to create a personalized learning experience
 
 ---
 
-# Installation
+# ⚙️ Installation
 
 ## Clone Repository
 
 ```bash
-git clone https://github.com/Karan-codes1/careerpath-roadmap-builder.git
+git clone https://github.com/yourusername/careerpath.git
 ```
 
 ## Frontend
@@ -297,7 +293,7 @@ npm run dev
 
 ---
 
-# Environment Variables
+# 🔑 Environment Variables
 
 ## Frontend (.env.local)
 
@@ -327,7 +323,7 @@ OPENROUTER_API_KEY=
 
 ---
 
-# Future Improvements
+# 🚀 Future Improvements
 
 - AI-generated quizzes
 - AI Mentor Chatbot
@@ -341,14 +337,14 @@ OPENROUTER_API_KEY=
 
 ---
 
-# 👨Author
+# 👨‍💻 Author
 
 ### Karan Raj
 
 **LinkedIn**
 
-https://www.linkedin.com/in/karan-raj2005/
+https://linkedin.com/in/your-linkedin
 
 **GitHub**
 
-https://github.com/Karan-codes1
+https://github.com/your-github
