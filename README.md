@@ -341,7 +341,7 @@ OPENROUTER_API_KEY=
 
 ---
 
-# 👨Author
+# Author
 
 ### Karan Raj
 
