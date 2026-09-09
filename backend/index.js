@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== "production") {
 const app = express();
 const port = process.env.PORT || 8080;
 
-// ✅ CORS MUST BE FIRST
+// CORS MUST BE FIRST
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -35,14 +35,14 @@ app.use(cors({
 
 
 
-// ✅ Other middleware
+// Other middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Connect to DB
+// Connect to DB
 await connectDB();
 
-// ✅ Routes
+// Routes
 app.use('/auth', AuthRouter);
 app.use('/roadmap', RoadmapRouter);
 app.use('/milestone', MilestoneRouter);
@@ -53,7 +53,7 @@ app.use('/dashboard', DashboardRouter);
 app.use('/ai', AIRouter);
 app.use('/quiz', QuizRouter);
 
-// ✅ Start server
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
