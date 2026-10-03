@@ -26,20 +26,20 @@ const STATUS = {
   correct: {
     label: "Correct",
     icon: CheckCircle,
-    pill: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    number: "bg-emerald-100 text-emerald-700",
+    pill: "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300",
+    number: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300",
   },
   incorrect: {
     label: "Incorrect",
     icon: XCircle,
-    pill: "border-red-200 bg-red-50 text-red-600",
-    number: "bg-red-100 text-red-600",
+    pill: "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400",
+    number: "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400",
   },
   skipped: {
     label: "Skipped",
     icon: MinusCircle,
-    pill: "border-gray-200 bg-gray-100 text-gray-600",
-    number: "bg-gray-100 text-gray-600",
+    pill: "border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400",
+    number: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400",
   },
 }
 
@@ -109,14 +109,14 @@ function QuestionReview({ question, number, userAnswer, status, aiExplanation, a
   const StatusIcon = meta.icon
 
   return (
-    <article className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+    <article className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm sm:p-5">
       <div className="flex items-start gap-3">
         <span
           className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${meta.number}`}
         >
           {number}
         </span>
-        <p className="flex-1 text-sm font-semibold text-gray-900 sm:text-base">
+        <p className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 sm:text-base">
           {question.question}
         </p>
         <span
@@ -132,9 +132,9 @@ function QuestionReview({ question, number, userAnswer, status, aiExplanation, a
           const isCorrectOption = i === question.correctIndex
           const isChosen = i === userAnswer
 
-          let rowStyle = "border-gray-100 bg-white text-gray-500"
-          if (isCorrectOption) rowStyle = "border-emerald-200 bg-emerald-50 text-emerald-800"
-          else if (isChosen) rowStyle = "border-red-200 bg-red-50 text-red-700"
+          let rowStyle = "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400"
+          if (isCorrectOption) rowStyle = "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300"
+          else if (isChosen) rowStyle = "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
 
           return (
             <li
@@ -164,14 +164,14 @@ function QuestionReview({ question, number, userAnswer, status, aiExplanation, a
 
       <div className="mt-3 space-y-2 sm:pl-10">
         {question.explanation && (
-          <p className="rounded-lg border-l-4 border-[#339999] bg-gray-50 px-3 py-2 text-sm text-gray-700">
-            <span className="font-semibold text-[#267373]">Explanation: </span>
+          <p className="rounded-lg border-l-4 border-[#339999] bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+            <span className="font-semibold text-[#267373] dark:text-[#5fc9c9]">Explanation: </span>
             {question.explanation}
           </p>
         )}
 
         {aiExplanation && (
-          <div className="rounded-lg border-l-4 border-blue-400 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+          <div className="rounded-lg border-l-4 border-blue-400 bg-blue-50 dark:bg-blue-950/40 px-3 py-2 text-sm text-blue-800 dark:text-blue-300">
             <span className="mb-1 flex items-center gap-1.5 font-semibold">
               <Sparkles className="h-4 w-4" />
               AI explanation
@@ -184,7 +184,7 @@ function QuestionReview({ question, number, userAnswer, status, aiExplanation, a
           type="button"
           disabled={aiLoading}
           onClick={onExplain}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[#339999] px-3 py-1.5 text-sm font-medium text-[#267373] transition-colors hover:bg-[#339999] hover:text-white disabled:cursor-wait disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-[#267373]"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[#339999] px-3 py-1.5 text-sm font-medium text-[#267373] dark:text-[#5fc9c9] transition-colors hover:bg-[#339999] hover:text-white disabled:cursor-wait disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-[#267373] dark:disabled:hover:text-[#5fc9c9]"
         >
           <Lightbulb className="h-4 w-4" />
           {aiLoading ? "Generating..." : aiExplanation ? "Explain again" : "Explain with AI"}
@@ -352,7 +352,7 @@ export default function QuizResults({ score, total, answers, questions, onRestar
         {/* ---------- Answer review ---------- */}
         <section className="space-y-4 lg:col-span-2">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">Review your answers</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 sm:text-xl">Review your answers</h2>
 
             <div className="flex flex-wrap gap-2">
               {filters.map(f => {
@@ -366,11 +366,11 @@ export default function QuizResults({ score, total, answers, questions, onRestar
                     className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors sm:text-sm ${
                       isActive
                         ? "border-[#339999] bg-[#339999] text-white"
-                        : "border-gray-200 bg-white text-gray-600 hover:bg-gray-100"
+                        : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                   >
                     {f.label}
-                    <span className={`ml-1.5 ${isActive ? "text-white/80" : "text-gray-400"}`}>
+                    <span className={`ml-1.5 ${isActive ? "text-white/80" : "text-gray-400 dark:text-gray-500"}`}>
                       {counts[f.key]}
                     </span>
                   </button>
@@ -398,7 +398,7 @@ export default function QuizResults({ score, total, answers, questions, onRestar
             <button
               type="button"
               onClick={onRestart}
-              className="inline-flex items-center gap-2 rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900"
+              className="inline-flex items-center gap-2 rounded-lg bg-gray-800 dark:bg-gray-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900 dark:hover:bg-gray-600"
             >
               <RotateCcw className="h-4 w-4" />
               Retake quiz
@@ -408,13 +408,13 @@ export default function QuizResults({ score, total, answers, questions, onRestar
 
         {/* ---------- Recommended resources ---------- */}
         <aside id="recommended-resources" className="scroll-mt-20 lg:sticky lg:top-20 lg:self-start">
-          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-100 p-4 sm:p-5">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-[#267373] sm:text-lg">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
+            <div className="border-b border-gray-100 dark:border-gray-800 p-4 sm:p-5">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-[#267373] dark:text-[#5fc9c9] sm:text-lg">
                 <BookOpen className="h-5 w-5" />
                 Recommended for you
               </h2>
-              <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                 Learning resources picked from the questions you missed.
               </p>
             </div>
@@ -422,13 +422,13 @@ export default function QuizResults({ score, total, answers, questions, onRestar
             <div className="p-3 sm:p-4 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
               {loadingRecs ? (
                 <div className="space-y-3">
-                  <p className="text-sm italic text-gray-500">Analyzing your answers...</p>
+                  <p className="text-sm italic text-gray-500 dark:text-gray-400">Analyzing your answers...</p>
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="flex items-center gap-3 rounded-lg border border-gray-100 p-3">
-                      <div className="h-9 w-9 shrink-0 animate-pulse rounded-lg bg-gray-200" />
+                    <div key={i} className="flex items-center gap-3 rounded-lg border border-gray-100 dark:border-gray-800 p-3">
+                      <div className="h-9 w-9 shrink-0 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-3 w-4/5 animate-pulse rounded bg-gray-200" />
-                        <div className="h-3 w-1/3 animate-pulse rounded bg-gray-200" />
+                        <div className="h-3 w-4/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                        <div className="h-3 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                       </div>
                     </div>
                   ))}
@@ -443,29 +443,29 @@ export default function QuizResults({ score, total, answers, questions, onRestar
                         href={r.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-start gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:border-[#339999] hover:bg-gray-50"
+                        className="group flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-800 p-3 transition-colors hover:border-[#339999] hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#339999]/10 text-[#267373]">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#339999]/10 text-[#267373] dark:text-[#5fc9c9]">
                           <ResourceIcon className="h-4 w-4" />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-medium text-gray-800 group-hover:text-[#267373]">
+                          <span className="block text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-[#267373] dark:group-hover:text-[#5fc9c9]">
                             {r.title}
                           </span>
-                          <span className="mt-0.5 block text-xs capitalize text-gray-500">{r.type}</span>
+                          <span className="mt-0.5 block text-xs capitalize text-gray-500 dark:text-gray-400">{r.type}</span>
                         </span>
-                        <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#339999]" />
+                        <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-[#339999]" />
                       </a>
                     )
                   })}
                 </div>
               ) : recsFailed ? (
                 <div className="px-2 py-6 text-center">
-                  <p className="text-sm text-gray-600">Couldn&apos;t load recommendations.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Couldn&apos;t load recommendations.</p>
                   <button
                     type="button"
                     onClick={fetchRecommendations}
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[#339999] px-3 py-1.5 text-sm font-medium text-[#267373] transition-colors hover:bg-[#339999] hover:text-white"
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[#339999] px-3 py-1.5 text-sm font-medium text-[#267373] dark:text-[#5fc9c9] transition-colors hover:bg-[#339999] hover:text-white"
                   >
                     <RefreshCw className="h-4 w-4" />
                     Try again
@@ -474,13 +474,13 @@ export default function QuizResults({ score, total, answers, questions, onRestar
               ) : score === total ? (
                 <div className="px-2 py-6 text-center">
                   <Trophy className="mx-auto h-8 w-8 text-[#339999]" />
-                  <p className="mt-2 text-sm font-medium text-gray-800">Nothing to revise</p>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200">Nothing to revise</p>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     You got everything right. Move ahead to the next milestone!
                   </p>
                 </div>
               ) : (
-                <p className="px-2 py-6 text-center text-sm text-gray-500">
+                <p className="px-2 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
                   No matching resources found for this quiz yet. Use the explanations to review the
                   questions you missed.
                 </p>

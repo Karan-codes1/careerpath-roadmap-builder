@@ -11,7 +11,7 @@ export default function Question({
 
   return (
     <div>
-      <p className="mb-4 text-base font-semibold text-gray-900 md:text-lg">
+      <p className="mb-4 text-base font-semibold text-gray-900 dark:text-gray-100 md:text-lg">
         {questionNumber}. {question.question}
       </p>
 
@@ -22,25 +22,25 @@ export default function Question({
 
           const rowStyle = showCorrectAnswer
             ? isCorrect
-              ? "bg-green-100 border-green-500"
+              ? "bg-green-100 dark:bg-green-900/40 border-green-500"
               : isSelected
-              ? "bg-red-100 border-red-500"
-              : "border-gray-200 bg-white"
+              ? "bg-red-100 dark:bg-red-900/40 border-red-500"
+              : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
             : isSelected
             ? "border-[#339999] bg-[#339999]/10"
-            : "border-gray-200 bg-white hover:border-[#339999]/60 hover:bg-gray-50"
+            : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-[#339999]/60 hover:bg-gray-50 dark:hover:bg-gray-800"
 
           const labelStyle =
             !showCorrectAnswer && isSelected
               ? "border-[#339999] bg-[#339999] text-white"
-              : "border-gray-300 bg-white text-gray-600"
+              : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400"
 
           return (
             <button
               key={i}
               type="button"
               aria-pressed={isSelected}
-              className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm text-gray-800 transition-colors sm:px-4 sm:py-3 sm:text-base ${rowStyle}`}
+              className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left text-sm text-gray-800 dark:text-gray-200 transition-colors sm:px-4 sm:py-3 sm:text-base ${rowStyle}`}
               onClick={() => onAnswerSelect(i)}
             >
               <span
@@ -55,7 +55,7 @@ export default function Question({
       </div>
 
       {showCorrectAnswer && (
-        <p className="mt-3 text-sm text-gray-600">
+        <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
           ✅ Correct Answer: {question.options[question.correctIndex]}
         </p>
       )}

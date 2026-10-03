@@ -2,3 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Native controls and scrollbars follow the theme */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Borders that don't name a colour (plain `border`, `border-b`) */
+  .dark *,
+  .dark ::before,
+  .dark ::after {
+    border-color: theme('colors.gray.800');
+  }
+}
+

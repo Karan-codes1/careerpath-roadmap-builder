@@ -18,45 +18,45 @@ import {
 
 function ProjectSkeletonCard() {
   return (
-    <div className="h-full bg-white border border-gray-200 rounded-xl p-5 md:p-6 animate-pulse">
+    <div className="h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 md:p-6 animate-pulse">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex-1">
           {/* Title */}
-          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
           {/* Description */}
-          <div className="h-4 bg-gray-200 rounded w-full mb-1" />
-          <div className="h-4 bg-gray-200 rounded w-5/6" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-1" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
         </div>
 
         {/* Difficulty Badge */}
-        <div className="h-6 w-20 bg-gray-200 rounded-full" />
+        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
       </div>
 
       {/* Meta row (duration / popularity) */}
       <div className="flex gap-4 mb-6">
-        <div className="h-4 w-20 bg-gray-200 rounded" />
-        <div className="h-4 w-24 bg-gray-200 rounded" />
+        <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
       </div>
 
       {/* Required Skills */}
       <div className="mb-6">
-        <div className="h-4 w-28 bg-gray-200 rounded mb-3" />
+        <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
         <div className="flex flex-wrap gap-2">
-          <div className="h-6 w-16 bg-gray-200 rounded-full" />
-          <div className="h-6 w-20 bg-gray-200 rounded-full" />
-          <div className="h-6 w-14 bg-gray-200 rounded-full" />
+          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded-full" />
+          <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
+          <div className="h-6 w-14 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
       </div>
 
       {/* Key Features */}
       <div>
-        <div className="h-4 w-24 bg-gray-200 rounded mb-3" />
+        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
         <div className="space-y-2">
-          <div className="h-3 bg-gray-200 rounded w-full" />
-          <div className="h-3 bg-gray-200 rounded w-11/12" />
-          <div className="h-3 bg-gray-200 rounded w-10/12" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-11/12" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-10/12" />
         </div>
       </div>
 
@@ -110,9 +110,9 @@ function ProjectsContent() {
       : projects.filter((p) => p.difficulty === difficulty);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6 md:py-8 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6 md:py-8 overflow-x-hidden">
       {/* Header */}
-      <div className="mb-6 p-6 md:p-8 bg-gray-800 text-white rounded-2xl shadow-lg max-w-5xl mx-auto">
+      <div className="mb-6 p-6 md:p-8 bg-gray-800 dark:border dark:border-gray-700 text-white rounded-2xl shadow-lg max-w-5xl mx-auto">
         <p className="mb-1 text-xs font-medium uppercase tracking-wider text-white/70">Project ideas</p>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">{roadmapName || "Roadmap"}</h1>
         <p className="text-sm sm:text-base text-white/90">
@@ -130,17 +130,17 @@ function ProjectsContent() {
         <div className="w-full sm:w-60">
           <Select value={difficulty} onValueChange={setDifficulty}>
             <SelectTrigger
-              className="bg-gray-800 text-white w-full rounded-lg border border-gray-700 data-[size=default]:h-11 flex items-center px-4"
+              className="bg-gray-800 dark:bg-gray-700 text-white w-full rounded-lg border border-gray-700 data-[size=default]:h-11 flex items-center px-4"
             >
               <SelectValue placeholder="Set Difficulty (Mixed)" />
             </SelectTrigger>
 
-            <SelectContent className="bg-gray-800 text-white rounded-md shadow-lg border border-gray-900">
+            <SelectContent className="bg-gray-800 dark:bg-gray-700 text-white rounded-md shadow-lg border border-gray-900 dark:border-gray-600">
               {difficultyOptions.map((option) => (
                 <SelectItem
                   key={option}
                   value={option}
-                  className="cursor-pointer rounded-md px-4 py-2 hover:bg-gray-900 focus:bg-gray-900"
+                  className="cursor-pointer rounded-md px-4 py-2 hover:bg-gray-900 dark:hover:bg-gray-600 focus:bg-gray-900 dark:focus:bg-gray-600"
                 >
                   {option === "Mixed" ? "Set Difficulty (Mixed)" : option}
                 </SelectItem>
@@ -153,7 +153,7 @@ function ProjectsContent() {
         <button
           onClick={fetchProjects}
           disabled={loading}
-          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gray-800 px-5 text-sm font-medium text-white transition-colors hover:bg-gray-900 disabled:opacity-50 sm:w-auto"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gray-800 dark:bg-gray-700 px-5 text-sm font-medium text-white transition-colors hover:bg-gray-900 dark:hover:bg-gray-600 disabled:opacity-50 sm:w-auto"
         >
           <Sparkles className="h-4 w-4" />
           {loading ? "Generating..." : "Generate Project Ideas"}
@@ -161,31 +161,31 @@ function ProjectsContent() {
       </div>
 
       {error && (
-        <p className="mx-auto mt-2 max-w-5xl rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-600">
+        <p className="mx-auto mt-2 max-w-5xl rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-center text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       )}
 
       {/* Empty State */}
       {!loading && projects.length === 0 && !error && (
-        <div className="max-w-5xl mx-auto mt-8 bg-white border border-gray-200 rounded-2xl px-6 py-10 shadow-sm">
+        <div className="max-w-5xl mx-auto mt-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-6 py-10 shadow-sm">
           <div className="flex flex-col items-center text-center">
 
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Generate project ideas for this roadmap 🚀
             </h3>
 
-            <p className="text-gray-600 text-sm max-w-md mb-6">
+            <p className="text-gray-600 dark:text-gray-400 text-sm max-w-md mb-6">
               Get real-world, resume-ready project ideas tailored to your selected
               roadmap and difficulty level.
             </p>
 
             {/* Promise bullets */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700 dark:text-gray-300 mb-8">
               {["Real-world projects", "Difficulty-based progression", "Skills mapped to roadmap"].map((item) => (
                 <div
                   key={item}
-                  className="flex items-center justify-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-3"
+                  className="flex items-center justify-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3"
                 >
                   <Check className="h-4 w-4 shrink-0 text-[#339999]" />
                   {item}
@@ -200,8 +200,8 @@ function ProjectsContent() {
               className="w-40 opacity-90 mb-4"
             />
 
-            <p className="text-sm text-gray-500">
-              Click <span className="font-medium text-gray-700">Generate Project Ideas</span> to begin
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Click <span className="font-medium text-gray-700 dark:text-gray-300">Generate Project Ideas</span> to begin
             </p>
           </div>
         </div>
@@ -235,7 +235,7 @@ function ProjectsContent() {
 // 3. Export the wrapper component
 export default function RoadmapProjects() {
   return (
-    <Suspense fallback={<div className="py-20 text-center text-gray-500">Loading project generator...</div>}>
+    <Suspense fallback={<div className="py-20 text-center text-gray-500 dark:text-gray-400">Loading project generator...</div>}>
       <ProjectsContent />
     </Suspense>
   );

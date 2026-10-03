@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Navbar() {
   //  ALL hooks at the top (no conditions)
@@ -35,17 +36,17 @@ export default function Navbar() {
   const desktopLink = (href) =>
     `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
       pathname === href
-        ? 'text-[#008080]'
-        : 'text-gray-700 hover:bg-gray-100 hover:text-[#008080]'
+        ? 'text-[#008080] dark:text-[#5fc9c9]'
+        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#008080] dark:hover:text-[#5fc9c9]'
     }`;
 
   const mobileLink = (href) =>
     `block rounded-md px-3 py-2 text-sm font-medium ${
-      pathname === href ? 'bg-gray-100 text-[#008080]' : 'text-gray-700 hover:bg-gray-100'
+      pathname === href ? 'bg-gray-100 dark:bg-gray-800 text-[#008080] dark:text-[#5fc9c9]' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
     }`;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+    <nav className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 shadow-sm backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
@@ -57,6 +58,7 @@ export default function Navbar() {
             CareerPath
           </Link>
 
+          <div className="flex items-center gap-1 md:gap-2">
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-2">
             <Link href="/" className={desktopLink('/')}>
@@ -79,7 +81,7 @@ export default function Navbar() {
               <>
                 <button
                   onClick={() => router.push('/login')}
-                  className="ml-2 rounded-md border border-[#008080] px-4 py-2 text-sm font-medium text-[#008080] transition-colors hover:bg-[#008080]/10"
+                  className="ml-2 rounded-md border border-[#008080] px-4 py-2 text-sm font-medium text-[#008080] dark:text-[#5fc9c9] transition-colors hover:bg-[#008080]/10"
                 >
                   Login
                 </button>
@@ -93,23 +95,26 @@ export default function Navbar() {
             )}
           </div>
 
+          <ThemeToggle />
+
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isOpen}
-              className="rounded-md p-2 text-gray-700 hover:bg-gray-100"
+              className="rounded-md p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+          </div>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden fixed top-16 left-0 w-full bg-white border-b shadow-md z-50">
+        <div className="md:hidden fixed top-16 left-0 w-full bg-white dark:bg-gray-900 border-b shadow-md z-50">
           <div className="px-4 py-3 space-y-1">
             <Link href="/" className={mobileLink('/')}>
               Home
@@ -131,7 +136,7 @@ export default function Navbar() {
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Link
                   href="/login"
-                  className="rounded-md border border-[#008080] px-3 py-2 text-center text-sm font-medium text-[#008080]"
+                  className="rounded-md border border-[#008080] px-3 py-2 text-center text-sm font-medium text-[#008080] dark:text-[#5fc9c9]"
                 >
                   Login
                 </Link>
