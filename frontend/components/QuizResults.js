@@ -1,213 +1,493 @@
 "use client"
-import { useEffect, useState, useRef } from "react"
+
+import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 import api from "@/utils/api"
-import { Trophy, CheckCircle, XCircle, Lightbulb, RotateCcw, BookOpen, ArrowDown } from "lucide-react"
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  BookOpen,
+  CheckCircle,
+  FileText,
+  GraduationCap,
+  Lightbulb,
+  MinusCircle,
+  RefreshCw,
+  RotateCcw,
+  Sparkles,
+  Trophy,
+  Video,
+  XCircle,
+} from "lucide-react"
 
-const PRIMARY_TEAL = "bg-teal-600 hover:bg-teal-700"
-const PRIMARY_TEAL_LOAD = "bg-teal-400"
-const SUCCESS_GREEN = "text-emerald-600"
-const ERROR_RED = "text-red-500"
-const EXPLANATION_BORDER = "border-teal-500"
-const AI_EXPLANATION_BG = "bg-blue-50 border-blue-400 text-blue-800"
+const OPTION_LABELS = ["A", "B", "C", "D", "E", "F"]
 
-export default function QuizResults({ score, total, answers, questions, onRestart }) {
+const STATUS = {
+  correct: {
+    label: "Correct",
+    icon: CheckCircle,
+    pill: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    number: "bg-emerald-100 text-emerald-700",
+  },
+  incorrect: {
+    label: "Incorrect",
+    icon: XCircle,
+    pill: "border-red-200 bg-red-50 text-red-600",
+    number: "bg-red-100 text-red-600",
+  },
+  skipped: {
+    label: "Skipped",
+    icon: MinusCircle,
+    pill: "border-gray-200 bg-gray-100 text-gray-600",
+    number: "bg-gray-100 text-gray-600",
+  },
+}
+
+const RESOURCE_ICONS = {
+  video: Video,
+  article: FileText,
+  book: BookOpen,
+  course: GraduationCap,
+}
+
+/* ---------------------------------------------------
+   Score ring shown in the summary banner
+--------------------------------------------------- */
+function ScoreRing({ percent }) {
+  const radius = 42
+  const circumference = 2 * Math.PI * radius
+
+  return (
+    <div className="relative h-24 w-24 shrink-0 sm:h-28 sm:w-28">
+      <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+        <circle
+          cx="50"
+          cy="50"
+          r={radius}
+          fill="none"
+          strokeWidth="9"
+          className="stroke-white/25"
+        />
+        {percent > 0 && (
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            strokeWidth="9"
+            strokeLinecap="round"
+            className="stroke-white"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - percent / 100)}
+          />
+        )}
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+        <span className="text-2xl font-bold leading-none sm:text-3xl">{percent}%</span>
+        <span className="mt-1 text-[10px] font-medium uppercase tracking-wider text-white/80">
+          Score
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function Stat({ value, label }) {
+  return (
+    <div className="rounded-xl bg-white/15 px-3 py-2 text-center sm:px-4">
+      <div className="text-lg font-bold leading-tight sm:text-xl">{value}</div>
+      <div className="text-[11px] text-white/85 sm:text-xs">{label}</div>
+    </div>
+  )
+}
+
+/* ---------------------------------------------------
+   One reviewed question
+--------------------------------------------------- */
+function QuestionReview({ question, number, userAnswer, status, aiExplanation, aiLoading, onExplain }) {
+  const meta = STATUS[status]
+  const StatusIcon = meta.icon
+
+  return (
+    <article className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="flex items-start gap-3">
+        <span
+          className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${meta.number}`}
+        >
+          {number}
+        </span>
+        <p className="flex-1 text-sm font-semibold text-gray-900 sm:text-base">
+          {question.question}
+        </p>
+        <span
+          className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${meta.pill}`}
+        >
+          <StatusIcon className="h-3.5 w-3.5" />
+          {meta.label}
+        </span>
+      </div>
+
+      <ul className="mt-3 space-y-1.5 sm:pl-10">
+        {question.options.map((option, i) => {
+          const isCorrectOption = i === question.correctIndex
+          const isChosen = i === userAnswer
+
+          let rowStyle = "border-gray-100 bg-white text-gray-500"
+          if (isCorrectOption) rowStyle = "border-emerald-200 bg-emerald-50 text-emerald-800"
+          else if (isChosen) rowStyle = "border-red-200 bg-red-50 text-red-700"
+
+          return (
+            <li
+              key={i}
+              className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-sm ${rowStyle}`}
+            >
+              <span className="w-4 shrink-0 text-xs font-semibold">
+                {OPTION_LABELS[i] || i + 1}
+              </span>
+              <span className="min-w-0 flex-1 break-words">{option}</span>
+              {isCorrectOption && (
+                <span className="flex shrink-0 items-center gap-1 text-xs font-medium">
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  {isChosen ? "Your answer" : "Correct answer"}
+                </span>
+              )}
+              {isChosen && !isCorrectOption && (
+                <span className="flex shrink-0 items-center gap-1 text-xs font-medium">
+                  <XCircle className="h-3.5 w-3.5" />
+                  Your answer
+                </span>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+
+      <div className="mt-3 space-y-2 sm:pl-10">
+        {question.explanation && (
+          <p className="rounded-lg border-l-4 border-[#339999] bg-gray-50 px-3 py-2 text-sm text-gray-700">
+            <span className="font-semibold text-[#267373]">Explanation: </span>
+            {question.explanation}
+          </p>
+        )}
+
+        {aiExplanation && (
+          <div className="rounded-lg border-l-4 border-blue-400 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+            <span className="mb-1 flex items-center gap-1.5 font-semibold">
+              <Sparkles className="h-4 w-4" />
+              AI explanation
+            </span>
+            <p className="whitespace-pre-line">{aiExplanation}</p>
+          </div>
+        )}
+
+        <button
+          type="button"
+          disabled={aiLoading}
+          onClick={onExplain}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[#339999] px-3 py-1.5 text-sm font-medium text-[#267373] transition-colors hover:bg-[#339999] hover:text-white disabled:cursor-wait disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-[#267373]"
+        >
+          <Lightbulb className="h-4 w-4" />
+          {aiLoading ? "Generating..." : aiExplanation ? "Explain again" : "Explain with AI"}
+        </button>
+      </div>
+    </article>
+  )
+}
+
+/* ---------------------------------------------------
+   Quiz results page
+--------------------------------------------------- */
+export default function QuizResults({ score, total, answers, questions, onRestart, title, roadmapId }) {
   const [aiExplanations, setAiExplanations] = useState({})
   const [loading, setLoading] = useState({})
   const [recommendations, setRecommendations] = useState([])
-  const [loadingRecs, setLoadingRecs] = useState(false)
+  const [loadingRecs, setLoadingRecs] = useState(true)
+  const [recsFailed, setRecsFailed] = useState(false)
+  const [filter, setFilter] = useState("all")
 
-  const resourcesRef = useRef(null)
-  const lastQuestionRef = useRef(null)
+  // The results never change while this screen is open, so one request is enough
+  const requestedRecs = useRef(false)
+
+  const reviewed = questions.map((q, index) => {
+    const answer = answers.find(a => a.questionId === q._id)
+    const userAnswer = answer ? answer.selected : null
+    const status =
+      userAnswer === null ? "skipped" : userAnswer === q.correctIndex ? "correct" : "incorrect"
+
+    return { question: q, number: index + 1, userAnswer, status }
+  })
+
+  const counts = {
+    all: reviewed.length,
+    correct: reviewed.filter(r => r.status === "correct").length,
+    incorrect: reviewed.filter(r => r.status === "incorrect").length,
+    skipped: reviewed.filter(r => r.status === "skipped").length,
+  }
+
+  const percent = total > 0 ? Math.round((score / total) * 100) : 0
+  const visible = filter === "all" ? reviewed : reviewed.filter(r => r.status === filter)
+
+  const message =
+    score === total
+      ? "Perfect score! Outstanding work."
+      : score > total * 0.5
+        ? "Great job! Keep the momentum going."
+        : "Review the answers below and try again."
+
+  const filters = [
+    { key: "all", label: "All" },
+    { key: "incorrect", label: "Incorrect" },
+    { key: "skipped", label: "Skipped" },
+    { key: "correct", label: "Correct" },
+  ].filter(f => f.key === "all" || counts[f.key] > 0)
 
   const fetchAIExplanation = async (q, userAnswer) => {
     try {
       setLoading(prev => ({ ...prev, [q._id]: true }))
       const res = await api.post("/ai/explanation", {
-        question: q.question,
-        correctAnswer: q.options[q.correctIndex],
-        selectedAnswer: userAnswer !== null ? q.options[userAnswer] : "Not Answered"
+        questionId: q._id,
+        selectedAnswer: userAnswer,
       })
       setAiExplanations(prev => ({ ...prev, [q._id]: res.data.explanation }))
     } catch (err) {
-      setAiExplanations(prev => ({ ...prev, [q._id]: "⚠️ Failed to fetch AI explanation." }))
+      const limitMessage = err?.response?.status === 429 ? err.response.data?.message : null
+      setAiExplanations(prev => ({
+        ...prev,
+        [q._id]: limitMessage || "Failed to fetch AI explanation. Please try again.",
+      }))
     } finally {
       setLoading(prev => ({ ...prev, [q._id]: false }))
     }
   }
 
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        setLoadingRecs(true)
-        const quizResults = questions.map(q => {
-          const ans = answers.find(a => a.questionId === q._id)
-          return {
-            topic: q.question,
-            score: ans && ans.selected === q.correctIndex ? 1 : 0,
-            total: 1
-          }
-        })
-        const res = await api.post("/ai/recommendations", { quizResults })
-        setRecommendations(res.data.recommendations || [])
-      } catch (err) {
-        console.error("Error fetching recommendations:", err)
-      } finally {
-        setLoadingRecs(false)
-      }
-    }
-    fetchRecommendations()
-  }, [])
-
-  const handleScrollDown = () => {
-    if (window.innerWidth < 768) {
-      // mobile: scroll to resources
-      resourcesRef.current?.scrollIntoView({ behavior: "smooth" })
-    } else {
-      // desktop: scroll to last question
-      lastQuestionRef.current?.scrollIntoView({ behavior: "smooth" })
+  const fetchRecommendations = async () => {
+    try {
+      setLoadingRecs(true)
+      setRecsFailed(false)
+      // Send only opaque references — the backend grades against its own data
+      const quizResults = questions.map(q => {
+        const ans = answers.find(a => a.questionId === q._id)
+        return {
+          questionId: q._id,
+          userSelectedAnswer: ans ? ans.selected : null,
+        }
+      })
+      const res = await api.post("/ai/recommendations", { quizResults })
+      setRecommendations(res.data.recommendations || [])
+    } catch (err) {
+      console.error("Error fetching recommendations:", err)
+      setRecsFailed(true)
+    } finally {
+      setLoadingRecs(false)
     }
   }
 
+  useEffect(() => {
+    if (requestedRecs.current) return
+    requestedRecs.current = true
+    fetchRecommendations()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
-    <div className="p-4 md:p-6 bg-white rounded-lg shadow-xl w-full max-w-6xl mx-auto">
-      {/* --- TOP: Quiz Result Centered --- */}
-      <div className="flex justify-center mb-6">
-        <div className={`${PRIMARY_TEAL} text-white p-4 sm:p-5 md:p-6 rounded-xl shadow-lg flex flex-col items-center gap-2 text-center`}>
-          <Trophy className="w-10 h-10 sm:w-12 sm:h-12" />
-          <h2 className="text-lg sm:text-xl md:text-2xl font-light tracking-wide">Quiz Result</h2>
-          <p className="text-xl sm:text-2xl font-extrabold mt-1">{score} / {total}</p>
-          <p className="text-sm sm:text-base opacity-90">
-            {score === total
-              ? "Perfect score! Outstanding work"
-              : score > total * 0.5
-                ? "Great job! Keep the momentum going"
-                : "Review the answers and try again"}
-          </p>
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-6xl space-y-6">
+      {/* ---------- Summary banner ---------- */}
+      <section className="rounded-2xl bg-[#339999] p-5 text-white shadow-lg sm:p-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <ScoreRing percent={percent} />
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wider text-white/80">
+                Quiz result
+              </p>
+              <h1 className="text-xl font-semibold leading-snug sm:text-2xl">
+                {title || "Your results"}
+              </h1>
+              <p className="mt-1 text-sm text-white/90">
+                You got <span className="font-semibold text-white">{score}</span> of{" "}
+                <span className="font-semibold text-white">{total}</span> correct. {message}
+              </p>
+            </div>
+          </div>
 
-      
-      {/* --- TWO COLUMN LAYOUT: Questions (Left) and Resources (Right) --- */}
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* LEFT: Questions */}
-        <div className="flex-1 space-y-3">
-          {questions.map((q, index) => {
-            const userAnswerObj = answers.find(a => a.questionId === q._id)
-            const userAnswer = userAnswerObj ? userAnswerObj.selected : null
-            const isCorrect = userAnswer === q.correctIndex
-            const notAnswered = userAnswer === null
+          <div className="flex flex-col gap-3 md:items-end">
+            <div className="grid grid-cols-3 gap-2">
+              <Stat value={counts.correct} label="Correct" />
+              <Stat value={counts.incorrect} label="Incorrect" />
+              <Stat value={counts.skipped} label="Skipped" />
+            </div>
 
-            const isLastQuestion = index === questions.length - 1
-
-            return (
-              <div
-                key={index}
-                ref={isLastQuestion ? lastQuestionRef : null}
-                className="p-3 border border-gray-200 rounded-lg shadow-sm"
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onRestart}
+                className="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#267373] transition-colors hover:bg-gray-100 md:flex-none"
               >
-                <p className="font-semibold mb-1 text-sm md:text-base text-gray-800">
-                  {index + 1}. {q.question}
-                </p>
-
-                <div className="text-sm md:text-sm space-y-1">
-                  {isCorrect ? (
-                    <p className={`flex items-start ${SUCCESS_GREEN} font-medium`}>
-                      <CheckCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                      You answered correctly!
-                    </p>
-                  ) : (
-                    <>
-                      <p className={`flex items-start ${ERROR_RED} font-medium`}>
-                        <XCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                        Your Answer: {notAnswered ? "Not Answered" : q.options[userAnswer]}
-                      </p>
-                      <p className={`flex items-start ${SUCCESS_GREEN} font-medium`}>
-                        <CheckCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                        Correct Answer: {q.options[q.correctIndex]}
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                {!aiExplanations[q._id] && q.explanation && (
-                  <div className={`mt-2 bg-gray-50 border-l-4 ${EXPLANATION_BORDER} p-2 rounded-md text-gray-700 text-sm`}>
-                    <span className="font-semibold text-teal-700">Explanation:</span> {q.explanation}
-                  </div>
-                )}
-
-                <div className="mt-2">
-                  <button
-                    disabled={loading[q._id]}
-                    onClick={() => fetchAIExplanation(q, userAnswer)}
-                    className={`px-3 py-1.5 rounded-lg flex items-center gap-2 text-white text-sm font-medium transition-colors ${loading[q._id] ? PRIMARY_TEAL_LOAD : PRIMARY_TEAL}`}
-                  >
-                    <Lightbulb className="w-4 h-4" />
-                    {loading[q._id] ? "Generating..." : "AI Explanation"}
-                  </button>
-
-                  {aiExplanations[q._id] && (
-                    <div className={`mt-2 ${AI_EXPLANATION_BG} border-l-4 p-2 rounded-md text-sm`}>
-                      <span className="font-bold flex items-center gap-1 mb-1">
-                        <Lightbulb className="w-4 h-4" /> AI Explanation:
-                      </span>
-                      {aiExplanations[q._id]}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-
-          {/* --- Restart Button Below Questions --- */}
-          <div className="mt-6 flex justify-center md:justify-start">
-            <button
-              onClick={onRestart}
-              className="bg-gray-800 hover:bg-gray-900 text-white px-5 py-3 md:px-6 md:py-3 rounded-full shadow-lg flex items-center gap-2 text-sm sm:text-base md:text-base font-semibold transition-colors"
-            >
-              <RotateCcw className="w-5 h-5 md:w-5 md:h-5" />
-              Restart Quiz
-            </button>
+                <RotateCcw className="h-4 w-4" />
+                Retake quiz
+              </button>
+              {roadmapId && (
+                <Link
+                  href={`/roadmap/${roadmapId}`}
+                  className="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-white/60 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10 md:flex-none"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to roadmap
+                </Link>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* RIGHT: Resource Recommendations */}
-        <div className="w-full md:w-1/3" ref={resourcesRef}>
-          <h3 className="text-xl md:text-2xl font-semibold text-[#267373] mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            Personalized Learning Resources
-          </h3>
+        <a
+          href="#recommended-resources"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white underline underline-offset-4 lg:hidden"
+        >
+          <BookOpen className="h-4 w-4" />
+          See recommended resources
+        </a>
+      </section>
 
-          {loadingRecs ? (
-            <p className="text-gray-500 italic">Analyzing your performance and generating recommendations...</p>
-          ) : recommendations.length > 0 ? (
-            <div className="space-y-3">
-              {recommendations.map((r, i) => (
-                <a
-                  key={i}
-                  href={r.url}
-                  target="_blank"
-                  className="block border border-gray-200 p-3 rounded-lg bg-gray-50 hover:shadow-md transition-all"
-                >
-                  <h4 className="font-medium text-gray-800">{r.title}</h4>
-                  <p className="text-sm text-gray-500 capitalize">{r.type}</p>
-                  <span className="text-[#267373] underline text-sm mt-1 inline-block">
-                    View Resource →
-                  </span>
-                </a>
-              ))}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* ---------- Answer review ---------- */}
+        <section className="space-y-4 lg:col-span-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">Review your answers</h2>
+
+            <div className="flex flex-wrap gap-2">
+              {filters.map(f => {
+                const isActive = filter === f.key
+                return (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => setFilter(f.key)}
+                    aria-pressed={isActive}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors sm:text-sm ${
+                      isActive
+                        ? "border-[#339999] bg-[#339999] text-white"
+                        : "border-gray-200 bg-white text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {f.label}
+                    <span className={`ml-1.5 ${isActive ? "text-white/80" : "text-gray-400"}`}>
+                      {counts[f.key]}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
-          ) : (
-            <p className="text-gray-500 italic">No specific recommendations this time — great job!</p>
-          )}
-        </div>
-      </div>
-      
-      {/* --- Scroll Down Arrow --- */}
-      <div
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 cursor-pointer z-50 animate-bounce bg-white p-2 rounded-full shadow-lg"
-        onClick={handleScrollDown}
-      >
-        <ArrowDown className="w-6 h-6 text-gray-500" />
+          </div>
+
+          <div className="space-y-3">
+            {visible.map(item => (
+              <QuestionReview
+                key={item.question._id}
+                question={item.question}
+                number={item.number}
+                userAnswer={item.userAnswer}
+                status={item.status}
+                aiExplanation={aiExplanations[item.question._id]}
+                aiLoading={!!loading[item.question._id]}
+                onExplain={() => fetchAIExplanation(item.question, item.userAnswer)}
+              />
+            ))}
+          </div>
+
+          <div className="flex justify-center pt-2 lg:justify-start">
+            <button
+              type="button"
+              onClick={onRestart}
+              className="inline-flex items-center gap-2 rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Retake quiz
+            </button>
+          </div>
+        </section>
+
+        {/* ---------- Recommended resources ---------- */}
+        <aside id="recommended-resources" className="scroll-mt-20 lg:sticky lg:top-20 lg:self-start">
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-100 p-4 sm:p-5">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-[#267373] sm:text-lg">
+                <BookOpen className="h-5 w-5" />
+                Recommended for you
+              </h2>
+              <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+                Learning resources picked from the questions you missed.
+              </p>
+            </div>
+
+            <div className="p-3 sm:p-4 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+              {loadingRecs ? (
+                <div className="space-y-3">
+                  <p className="text-sm italic text-gray-500">Analyzing your answers...</p>
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-lg border border-gray-100 p-3">
+                      <div className="h-9 w-9 shrink-0 animate-pulse rounded-lg bg-gray-200" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-4/5 animate-pulse rounded bg-gray-200" />
+                        <div className="h-3 w-1/3 animate-pulse rounded bg-gray-200" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : recommendations.length > 0 ? (
+                <div className="space-y-2">
+                  {recommendations.map((r, i) => {
+                    const ResourceIcon = RESOURCE_ICONS[r.type] || BookOpen
+                    return (
+                      <a
+                        key={i}
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-start gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:border-[#339999] hover:bg-gray-50"
+                      >
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#339999]/10 text-[#267373]">
+                          <ResourceIcon className="h-4 w-4" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium text-gray-800 group-hover:text-[#267373]">
+                            {r.title}
+                          </span>
+                          <span className="mt-0.5 block text-xs capitalize text-gray-500">{r.type}</span>
+                        </span>
+                        <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 group-hover:text-[#339999]" />
+                      </a>
+                    )
+                  })}
+                </div>
+              ) : recsFailed ? (
+                <div className="px-2 py-6 text-center">
+                  <p className="text-sm text-gray-600">Couldn&apos;t load recommendations.</p>
+                  <button
+                    type="button"
+                    onClick={fetchRecommendations}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[#339999] px-3 py-1.5 text-sm font-medium text-[#267373] transition-colors hover:bg-[#339999] hover:text-white"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Try again
+                  </button>
+                </div>
+              ) : score === total ? (
+                <div className="px-2 py-6 text-center">
+                  <Trophy className="mx-auto h-8 w-8 text-[#339999]" />
+                  <p className="mt-2 text-sm font-medium text-gray-800">Nothing to revise</p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    You got everything right. Move ahead to the next milestone!
+                  </p>
+                </div>
+              ) : (
+                <p className="px-2 py-6 text-center text-sm text-gray-500">
+                  No matching resources found for this quiz yet. Use the explanations to review the
+                  questions you missed.
+                </p>
+              )}
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   )

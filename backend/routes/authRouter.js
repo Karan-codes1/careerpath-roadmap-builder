@@ -1,9 +1,16 @@
-import { Router } from "express";import express from 'express';
-import { signupValidation,loginValidation } from "../Middlewares/AuthValidation.js";
-import { login, signup } from "../controller/AuthController.js";
+import express from 'express';
+import { signupValidation, loginValidation } from "../Middlewares/AuthValidation.js";
+import ensureAuthenticated from "../Middlewares/Auth.js";
+import { login, signup, getMe, googleLogin, logout } from "../controller/AuthController.js";
+import { loginLimiter, signupLimiter } from "../Middlewares/RateLimit.js";
+
 const router = express.Router();
 
-router.post('/Signup',signupValidation,signup);
-router.post('/login',loginValidation,login);
-export default router;
+// The limiter runs first, so a blocked request never reaches the database
+router.post('/signup', signupLimiter, signupValidation, signup);
+router.post('/login', loginLimiter, loginValidation, login);
+router.post('/google', loginLimiter, googleLogin);
+router.post('/logout', logout);
+router.get('/me', ensureAuthenticated, getMe);
 
+export default router;

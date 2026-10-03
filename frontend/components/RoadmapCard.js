@@ -1,15 +1,7 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/context/AuthContext";
 import { Clock, Users, ArrowRight } from "lucide-react";
 
 export default function RoadmapCard({
@@ -23,7 +15,7 @@ export default function RoadmapCard({
   skills,
 }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useAuth();
 
   const getDifficultyColor = (level) => {
     if (typeof level !== "string") return "bg-gray-100 text-gray-800";
@@ -40,100 +32,87 @@ export default function RoadmapCard({
   };
 
   const handleStartLearning = () => {
-  if (status === "loading") return;
+    if (status === "loading") return;
 
-  if (status === "unauthenticated") {
-    router.push(
-      `/login?callbackUrl=${encodeURIComponent(`/roadmap/${_id}`)}`
-    );
-    return;
-  }
+    if (status === "unauthenticated") {
+      router.push(
+        `/login?callbackUrl=${encodeURIComponent(`/roadmap/${_id}`)}`
+      );
+      return;
+    }
 
-  router.push(`/roadmap/${_id}`);
-};
+    router.push(`/roadmap/${_id}`);
+  };
 
   return (
-    
-    <Card 
-    onClick={handleStartLearning}
-    className="h-full flex flex-col rounded-xl border hover:shadow-lg transition-shadow duration-200 group cursor-pointer">
-  
-  {/* HEADER */}
-  <CardHeader className="pb-2 space-y-2">
-    <div className="flex items-start justify-between gap-2">
-      <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
-        {icon}
-      </div>
-
-      <Badge
-        className={`${getDifficultyColor(difficulty)} whitespace-nowrap`}
-      >
-        {difficulty || "Unknown"}
-      </Badge>
-    </div>
-
-    <CardTitle className="text-lg font-semibold leading-snug line-clamp-1 group-hover:text-primary transition-colors">
-      {title || "Untitled"}
-    </CardTitle>
-
-    <CardDescription className="text-sm text-muted-foreground line-clamp-2">
-      {description || "No description available."}
-    </CardDescription>
-  </CardHeader>
-
-  {/* CONTENT */}
-  <CardContent className="flex flex-col flex-1 px-4 pb-4 pt-0">
-    
-    {/* META */}
-    <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
-      <div className="flex items-center gap-1">
-        <Clock className="w-4 h-4" />
-        <span>{duration || "N/A"}</span>
-      </div>
-
-      <div className="flex items-center gap-1">
-        <Users className="w-4 h-4" />
-        <span>{(learners?.toLocaleString?.() ?? 0)} learners</span>
-      </div>
-    </div>
-
-    {/* SKILLS */}
-    <div className="flex flex-wrap gap-2 mb-4">
-      {(skills || []).slice(0, 3).map((skill) => (
-        <Badge
-          key={skill}
-          variant="secondary"
-          className="text-xs bg-gray-200 border border-gray-300 rounded-full px-2 py-0.5"
-        >
-          {skill}
-        </Badge>
-      ))}
-
-      {(skills?.length || 0) > 3 && (
-        <Badge
-          variant="secondary"
-          className="text-xs bg-gray-200 border border-gray-300 rounded-full px-2 py-0.5"
-        >
-          +{skills.length - 3} more
-        </Badge>
-      )}
-    </div>
-
-    {/* BUTTON — PINNED TO BOTTOM */}
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleStartLearning();
-      }}
-      className="mt-auto w-full flex items-center justify-center gap-2 text-white px-3 py-3 my-2 rounded-md text-sm transition-all hover:opacity-90"
-      style={{ backgroundColor: "#030213" }}
+    <div
+      onClick={handleStartLearning}
+      className="group flex h-full cursor-pointer flex-col rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#339999]/60 hover:shadow-lg"
     >
-      Start Learning
-      <ArrowRight className="w-4 h-4" />
-    </button>
-  </CardContent>
-</Card>
+      {/* HEADER */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="shrink-0 rounded-lg bg-[#339999]/10 p-2.5 text-[#267373]">
+          {icon}
+        </div>
 
+        <span
+          className={`${getDifficultyColor(difficulty)} whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium`}
+        >
+          {difficulty || "Unknown"}
+        </span>
+      </div>
+
+      <h3 className="mt-4 text-lg font-semibold leading-snug text-gray-900 line-clamp-1 transition-colors group-hover:text-[#267373]">
+        {title || "Untitled"}
+      </h3>
+
+      <p className="mt-1.5 text-sm leading-relaxed text-gray-600 line-clamp-2">
+        {description || "No description available."}
+      </p>
+
+      {/* META */}
+      <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+        <div className="flex items-center gap-1.5">
+          <Clock className="w-4 h-4 text-gray-400" />
+          <span>{duration || "N/A"}</span>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <Users className="w-4 h-4 text-gray-400" />
+          <span>{(learners?.toLocaleString?.() ?? 0)} learners</span>
+        </div>
+      </div>
+
+      {/* SKILLS */}
+      <div className="mt-4 mb-5 flex flex-wrap gap-2">
+        {(skills || []).slice(0, 3).map((skill) => (
+          <span
+            key={skill}
+            className="rounded-full border border-gray-200 bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"
+          >
+            {skill}
+          </span>
+        ))}
+
+        {(skills?.length || 0) > 3 && (
+          <span className="rounded-full border border-gray-200 bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+            +{skills.length - 3} more
+          </span>
+        )}
+      </div>
+
+      {/* BUTTON — PINNED TO BOTTOM */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleStartLearning();
+        }}
+        className="mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-[#030213] px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-black"
+      >
+        Start Learning
+        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+      </button>
+    </div>
   );
 }

@@ -1,23 +1,19 @@
 'use client'
-console.log("ROADMAP DETAIL PAGE")
 
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import api from '@/utils/api'
-import { useSession } from 'next-auth/react'
-import { Clock, Trophy, Users, CheckCircle, Sparkles } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/context/AuthContext'
+import { Clock, Trophy, Users, CheckCircle, Sparkles, ArrowRight } from 'lucide-react'
 import { RoadmapDetailsStore } from '@/store/RoadmapDetailsStore'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 
 // ✅ Lazy load milestone cards
 const MilestoneCard = dynamic(() => import('@/components/MilestoneCard'), {
   loading: () => (
-    <div className="h-24 w-full bg-gray-100 rounded-lg animate-pulse" />
+    <div className="h-24 w-full bg-gray-100 rounded-xl animate-pulse" />
   ),
   ssr: false,
 })
@@ -25,7 +21,7 @@ const MilestoneCard = dynamic(() => import('@/components/MilestoneCard'), {
 export default function RoadmapDetailPage() {
   const { id } = useParams()
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { status } = useAuth()
 
   // ✅ Zustand store
   const { roadmapData, fetchRoadmapDetails } = RoadmapDetailsStore()
@@ -41,9 +37,9 @@ export default function RoadmapDetailPage() {
   // 1️⃣ Redirect unauthenticated users
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.replace('/login')
+      router.replace(`/login?callbackUrl=${encodeURIComponent(`/roadmap/${id}`)}`)
     }
-  }, [status, router])
+  }, [status, router, id])
 
   // 2️⃣ Fetch data only if authenticated
   useEffect(() => {
@@ -120,13 +116,12 @@ export default function RoadmapDetailPage() {
   const skillBadges = useMemo(
     () =>
       roadmap?.skills?.map((tag, index) => (
-        <Badge
+        <span
           key={index}
-          variant="secondary"
-          className="bg-gray-100 rounded-lg text-xs sm:text-sm px-2 py-0.5 sm:px-3 sm:py-1"
+          className="rounded-lg border border-gray-200 bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 sm:px-3 sm:py-1 sm:text-sm"
         >
           {tag}
-        </Badge>
+        </span>
       )) || [],
     [roadmap?.skills]
   )
@@ -146,97 +141,93 @@ export default function RoadmapDetailPage() {
 
   // ✅ SINGLE check AFTER hooks
   if (status === 'loading') return null;
-if (status === 'unauthenticated') return null;
-  
+  if (status === 'unauthenticated') return null;
+
+  const stats = [
+    { label: 'Duration', value: roadmap?.duration, icon: Clock, color: 'text-blue-500' },
+    { label: 'Difficulty', value: roadmap?.difficulty, icon: Trophy, color: 'text-yellow-500' },
+    { label: 'Enrolled', value: roadmap?.learners?.toLocaleString(), icon: Users, color: 'text-green-500' },
+    {
+      label: 'Success Rate',
+      value: roadmap?.completionRate != null ? `${roadmap.completionRate}%` : undefined,
+      icon: CheckCircle,
+      color: 'text-purple-500',
+    },
+  ]
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2">
-              <div className="flex items-start justify-between mb-3 sm:mb-4">
-                <div>
-                  <h1 className="mb-1 sm:mb-2 text-2xl sm:text-4xl font-extrabold tracking-wide bg-[#339999] text-transparent bg-clip-text underline underline-offset-4 decoration-[#339999]">
-                    {roadmap?.title || 'Loading...'}
-                  </h1>
-                  <p className="text-gray-600 mb-3 text-sm sm:text-base sm:mb-4">
-                    {roadmap?.description || ''}
-                  </p>
-                </div>
-              </div>
+              <h1 className="mb-2 text-2xl sm:text-4xl font-extrabold tracking-wide text-[#339999] underline decoration-[#339999]/40 decoration-2 underline-offset-8">
+                {roadmap?.title || 'Loading...'}
+              </h1>
+              <p className="mt-4 text-gray-600 text-sm sm:text-base leading-relaxed">
+                {roadmap?.description || ''}
+              </p>
 
-              <div className="flex flex-wrap gap-1 sm:gap-2 mb-4 sm:mb-6">{skillBadges}</div>
+              <div className="mt-4 flex flex-wrap gap-1.5 sm:gap-2">{skillBadges}</div>
 
-              <div className="grid grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
-                <div className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
-                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-blue-500" />
-                  <div className="text-xs sm:text-sm text-gray-500">Duration</div>
-                  <div className="text-sm sm:text-base">{roadmap?.duration}</div>
-                </div>
-                <div className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
-                  <Trophy className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-yellow-500" />
-                  <div className="text-xs sm:text-sm text-gray-500">Difficulty</div>
-                  <div className="text-sm sm:text-base">{roadmap?.difficulty}</div>
-                </div>
-                <div className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
-                  <Users className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-green-500" />
-                  <div className="text-xs sm:text-sm text-gray-500">Enrolled</div>
-                  <div className="text-sm sm:text-base">{roadmap?.learners?.toLocaleString()}</div>
-                </div>
-                <div className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-purple-500" />
-                  <div className="text-xs sm:text-sm text-gray-500">Success Rate</div>
-                  <div className="text-sm sm:text-base">{roadmap?.completionRate}%</div>
-                </div>
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                {stats.map(({ label, value, icon: Icon, color }) => (
+                  <div
+                    key={label}
+                    className="rounded-xl border border-gray-100 bg-gray-50 p-3 text-center sm:p-4"
+                  >
+                    <Icon className={`w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 ${color}`} />
+                    <div className="text-xs sm:text-sm text-gray-500">{label}</div>
+                    <div className="text-sm sm:text-base font-semibold text-gray-900">{value ?? '—'}</div>
+                  </div>
+                ))}
               </div>
 
               <button
                 onClick={handleGetProjectIdeas}
-                className="flex items-center gap-1 sm:gap-2 bg-gray-800 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm"
+                className="mt-5 flex items-center gap-2 rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-900"
               >
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Sparkles className="w-4 h-4" />
                 Get Project Ideas
               </button>
             </div>
 
             {/* Progress Card */}
             <div>
-              <Card>
-                <CardHeader className="py-3 sm:py-6">
-                  <CardTitle className="text-lg sm:text-xl">Your Progress</CardTitle>
-                  <CardDescription className="text-sm">
-                    {progress === 0
-                      ? "Let's get started!"
-                      : progress === 100
-                        ? 'You’ve completed the roadmap. Great job!'
-                        : "Keep going! You're doing great."}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2 sm:pt-6">
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-1 sm:mb-2">
-                        <span className="text-xs sm:text-sm">Overall Progress</span>
-                        <span className="text-xs sm:text-sm">{progress}%</span>
-                      </div>
-                      <Progress className="bg-black h-2 sm:h-3" value={progress} />
-                    </div>
+              <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Your Progress</h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  {progress === 0
+                    ? "Let's get started!"
+                    : progress === 100
+                      ? 'You’ve completed the roadmap. Great job!'
+                      : "Keep going! You're doing great."}
+                </p>
 
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center">
-                      <div>
-                        <div className="text-lg sm:text-xl text-green-500">{completedMilestones}</div>
-                        <div className="text-xs sm:text-sm text-green-500 font-semibold">Completed</div>
-                      </div>
-                      <div>
-                        <div className="text-lg sm:text-xl text-gray-500">{remainingMilestones}</div>
-                        <div className="text-xs sm:text-sm text-gray-500">Remaining</div>
-                      </div>
-                    </div>
+                <div className="mt-5">
+                  <div className="flex justify-between mb-2 text-xs sm:text-sm">
+                    <span className="text-gray-700">Overall Progress</span>
+                    <span className="font-semibold text-gray-900">{progress}%</span>
                   </div>
-                </CardContent>
-              </Card>
+                  <Progress
+                    className="h-2 sm:h-3"
+                    indicatorClassName="bg-[#339999]"
+                    value={progress}
+                  />
+                </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-3 text-center">
+                  <div className="rounded-lg bg-green-50 py-3">
+                    <div className="text-xl sm:text-2xl font-bold text-green-600">{completedMilestones}</div>
+                    <div className="text-xs sm:text-sm text-green-600 font-semibold">Completed</div>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 py-3">
+                    <div className="text-xl sm:text-2xl font-bold text-gray-600">{remainingMilestones}</div>
+                    <div className="text-xs sm:text-sm text-gray-500">Remaining</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -244,30 +235,30 @@ if (status === 'unauthenticated') return null;
 
       {/* Milestones Section */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-semibold">Milestones</h2>
-          <Badge variant="outline" className="text-xs sm:text-sm">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Milestones</h2>
+          <span className="rounded-md border border-gray-200 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 sm:text-sm">
             {milestonesLoading ? 'Loading...' : `${milestones.length} steps`}
-          </Badge>
+          </span>
         </div>
 
         {/* Conditional Rendering Logic */}
         {milestonesLoading ? (
           // ✅ Show skeletons when loading
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
             {Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={idx}
-                className="h-24 sm:h-28 w-full bg-gray-200 rounded-lg animate-pulse"
+                className="h-24 sm:h-28 w-full bg-gray-200 rounded-xl animate-pulse"
               />
             ))}
           </div>
         ) : milestones && milestones.length > 0 ? (
           // ✅ Show milestones once loaded
-          <div className="space-y-4 sm:space-y-6">{milestoneList}</div>
+          <div className="space-y-3 sm:space-y-4">{milestoneList}</div>
         ) : (
           // ✅ Show empty state only when loading has finished
-          <div className="text-gray-500 text-sm sm:text-base">
+          <div className="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-10 text-center text-gray-500 text-sm sm:text-base">
             No milestones available for this roadmap yet.
           </div>
         )}
@@ -276,18 +267,20 @@ if (status === 'unauthenticated') return null;
 
 
       {/* Take the Quiz CTA */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col items-center text-center">
-        <p className="text-base sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">
-          Ready to test your skills? Take the quiz now!
-        </p>
-        <Link href={`/quiz/${id}`}>
-          <Button className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-lg font-semibold transition">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14">
+        <div className="flex flex-col items-center rounded-2xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm sm:py-10">
+          <p className="text-base sm:text-2xl font-bold text-gray-800 mb-4">
+            Ready to test your skills? Take the quiz now!
+          </p>
+          <Link
+            href={`/quiz/${id}`}
+            className="inline-flex items-center gap-2 rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900 sm:px-6 sm:py-3 sm:text-lg"
+          >
             Take the Quiz
-          </Button>
-        </Link>
+            <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Link>
+        </div>
       </div>
     </div>
   )
 }
-
-

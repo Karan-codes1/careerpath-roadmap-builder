@@ -4,16 +4,16 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Navbar() {
   //  ALL hooks at the top (no conditions)
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { data: session } = useSession();
+  const { status, logout } = useAuth();
 
-  const isLoggedIn = !!session;
+  const isLoggedIn = status === 'authenticated';
 
   //  Hide navbar on auth pages
   const hideNavbar =
@@ -26,14 +26,26 @@ export default function Navbar() {
 
   if (hideNavbar) return null;
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
+  const handleLogout = () => {
+    logout();
   };
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  const desktopLink = (href) =>
+    `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+      pathname === href
+        ? 'text-[#008080]'
+        : 'text-gray-700 hover:bg-gray-100 hover:text-[#008080]'
+    }`;
+
+  const mobileLink = (href) =>
+    `block rounded-md px-3 py-2 text-sm font-medium ${
+      pathname === href ? 'bg-gray-100 text-[#008080]' : 'text-gray-700 hover:bg-gray-100'
+    }`;
+
   return (
-    <nav className="bg-white border-b shadow-sm sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
@@ -46,19 +58,19 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex space-x-6 items-center">
-            <Link href="/" className="text-gray-700 hover:text-[#008080] font-medium">
+          <div className="hidden md:flex items-center gap-2">
+            <Link href="/" className={desktopLink('/')}>
               Home
             </Link>
 
             {isLoggedIn ? (
               <>
-                <Link href="/about" className="text-gray-700 hover:text-[#008080] font-medium">
+                <Link href="/about" className={desktopLink('/about')}>
                   About
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="bg-[#008080] text-white hover:bg-[#006666] px-4 py-2 rounded-md text-sm"
+                  className="ml-2 rounded-md bg-[#008080] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#006666]"
                 >
                   Logout
                 </button>
@@ -67,13 +79,13 @@ export default function Navbar() {
               <>
                 <button
                   onClick={() => router.push('/login')}
-                  className="bg-[#008080] text-white hover:bg-[#006666] px-4 py-2 rounded-md text-sm"
+                  className="ml-2 rounded-md border border-[#008080] px-4 py-2 text-sm font-medium text-[#008080] transition-colors hover:bg-[#008080]/10"
                 >
                   Login
                 </button>
                 <button
                   onClick={() => router.push('/signup')}
-                  className="bg-[#008080] hover:bg-[#006666] text-white px-4 py-2 rounded-md text-sm"
+                  className="rounded-md bg-[#008080] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#006666]"
                 >
                   Sign Up
                 </button>
@@ -83,7 +95,12 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button onClick={toggleMenu}>
+            <button
+              onClick={toggleMenu}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              className="rounded-md p-2 text-gray-700 hover:bg-gray-100"
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -93,32 +110,38 @@ export default function Navbar() {
       {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden fixed top-16 left-0 w-full bg-white border-b shadow-md z-50">
-          <div className="px-4 py-4 space-y-2">
-            <Link href="/" className="block py-2 text-gray-700">
+          <div className="px-4 py-3 space-y-1">
+            <Link href="/" className={mobileLink('/')}>
               Home
             </Link>
 
             {isLoggedIn ? (
               <>
-                <Link href="/about" className="block py-2 text-gray-700">
+                <Link href="/about" className={mobileLink('/about')}>
                   About
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left py-2 text-gray-700"
+                  className="mt-2 w-full rounded-md bg-[#008080] px-3 py-2 text-sm font-medium text-white hover:bg-[#006666]"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
-                <Link href="/login" className="block py-2 text-gray-700">
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <Link
+                  href="/login"
+                  className="rounded-md border border-[#008080] px-3 py-2 text-center text-sm font-medium text-[#008080]"
+                >
                   Login
                 </Link>
-                <Link href="/signup" className="block py-2 text-gray-700">
+                <Link
+                  href="/signup"
+                  className="rounded-md bg-[#008080] px-3 py-2 text-center text-sm font-medium text-white"
+                >
                   Sign Up
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>

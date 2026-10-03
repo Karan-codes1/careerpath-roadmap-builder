@@ -7,8 +7,8 @@ const progressSchema = new mongoose.Schema({
       milestone: { type: mongoose.Schema.Types.ObjectId, ref: "Milestone", required: true },
       status: { 
         type: String, 
-        enum: ["not_started", "in progress", "completed"], 
-        default: "not started" 
+        enum: ["not_started", "in_progress", "completed"],
+        default: "not_started"
       }
     }
   ],

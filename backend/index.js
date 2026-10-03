@@ -14,6 +14,7 @@ import AIRouter from './routes/AIRouter.js'
 import QuizRouter from './routes/QuizRouter.js'
 
 import { connectDB } from './models/db.js';
+import { generalLimiter } from './Middlewares/RateLimit.js';
 
 if (process.env.NODE_ENV !== "production") {
     dotenv.config();
@@ -21,6 +22,11 @@ if (process.env.NODE_ENV !== "production") {
 
 const app = express();
 const port = process.env.PORT || 8080;
+
+// The hosting platform (Render) puts one proxy in front of this app. Trusting
+// it makes req.ip the visitor's real address instead of the proxy's — without
+// this, every visitor would share a single rate-limit counter.
+app.set('trust proxy', 1);
 
 // CORS MUST BE FIRST
 app.use(cors({
@@ -30,13 +36,18 @@ app.use(cors({
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-user-id"]
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 
 
+// Rate limiting comes AFTER cors so that a 429 response still carries the CORS
+// headers — otherwise the browser reports a CORS error instead of the message.
+app.use(generalLimiter);
+
 // Other middleware
 app.use(express.json());
+// Populates req.cookies, which is where the auth token now lives
 app.use(cookieParser());
 
 // Connect to DB

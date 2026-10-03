@@ -5,6 +5,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import api from "@/utils/api";
 import ProjectCard from "@/components/ProjectCard";
+import { Sparkles, Check } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -17,7 +18,7 @@ import {
 
 function ProjectSkeletonCard() {
   return (
-    <div className="h-full bg-white border rounded-xl p-4 md:p-6 animate-pulse">
+    <div className="h-full bg-white border border-gray-200 rounded-xl p-5 md:p-6 animate-pulse">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
@@ -86,7 +87,6 @@ function ProjectsContent() {
     setError("");
 
     try {
-      console.log("Fetching projects for roadmap:", roadmapName);
       const res = await api.post("/ai/projects", {
         roadmapName,
         difficulty: difficulty !== "Mixed" ? difficulty : undefined
@@ -94,7 +94,11 @@ function ProjectsContent() {
       setProjects(res.data.projects || []);
     } catch (err) {
       console.error("Error fetching AI projects:", err);
-      setError("Failed to generate project ideas. Please try again.");
+      setError(
+        err?.response?.status === 429
+          ? err.response.data?.message || "You've reached the limit for AI features. Please try again later."
+          : "Failed to generate project ideas. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -106,11 +110,12 @@ function ProjectsContent() {
       : projects.filter((p) => p.difficulty === difficulty);
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6 md:py-8 overflow-x-hidden">
       {/* Header */}
-      <div className="mb-6 p-6 bg-gray-800 text-white rounded-xl shadow-lg max-w-5xl mx-auto">
+      <div className="mb-6 p-6 md:p-8 bg-gray-800 text-white rounded-2xl shadow-lg max-w-5xl mx-auto">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wider text-white/70">Project ideas</p>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">{roadmapName || "Roadmap"}</h1>
-        <p className="text-base sm:text-lg opacity-90">
+        <p className="text-sm sm:text-base text-white/90">
           Explore carefully crafted project ideas to reinforce the skills from this roadmap.
         </p>
         <div className="mt-4 flex flex-wrap gap-2 sm:gap-4 text-sm">
@@ -120,12 +125,12 @@ function ProjectsContent() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-6 max-w-5xl mx-auto">
         {/* Difficulty Selector */}
         <div className="w-full sm:w-60">
           <Select value={difficulty} onValueChange={setDifficulty}>
             <SelectTrigger
-              className="bg-gray-800 text-white w-full rounded-lg border border-gray-300 h-14 flex items-center px-4"
+              className="bg-gray-800 text-white w-full rounded-lg border border-gray-700 data-[size=default]:h-11 flex items-center px-4"
             >
               <SelectValue placeholder="Set Difficulty (Mixed)" />
             </SelectTrigger>
@@ -148,20 +153,25 @@ function ProjectsContent() {
         <button
           onClick={fetchProjects}
           disabled={loading}
-          className="text-white px-4 py-2 rounded-lg bg-gray-800 disabled:opacity-50 w-full sm:w-auto"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gray-800 px-5 text-sm font-medium text-white transition-colors hover:bg-gray-900 disabled:opacity-50 sm:w-auto"
         >
+          <Sparkles className="h-4 w-4" />
           {loading ? "Generating..." : "Generate Project Ideas"}
         </button>
       </div>
 
-      {error && <p className="text-red-500 mt-2 text-center">{error}</p>}
+      {error && (
+        <p className="mx-auto mt-2 max-w-5xl rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
       {/* Empty State */}
       {!loading && projects.length === 0 && !error && (
-        <div className="max-w-5xl mx-auto mt-8 bg-gray-50 border border-gray-200 rounded-xl px-6 py-10 ">
+        <div className="max-w-5xl mx-auto mt-8 bg-white border border-gray-200 rounded-2xl px-6 py-10 shadow-sm">
           <div className="flex flex-col items-center text-center">
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Generate project ideas for this roadmap 🚀
             </h3>
 
@@ -171,16 +181,16 @@ function ProjectsContent() {
             </p>
 
             {/* Promise bullets */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-700 mb-8">
-              <div className="bg-white rounded-lg border px-4 py-3">
-                Real-world projects
-              </div>
-              <div className="bg-white rounded-lg border px-4 py-3">
-                Difficulty-based progression
-              </div>
-              <div className="bg-white rounded-lg border px-4 py-3">
-                Skills mapped to roadmap
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700 mb-8">
+              {["Real-world projects", "Difficulty-based progression", "Skills mapped to roadmap"].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-center justify-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-3"
+                >
+                  <Check className="h-4 w-4 shrink-0 text-[#339999]" />
+                  {item}
+                </div>
+              ))}
             </div>
 
             {/* Illustration */}
@@ -200,7 +210,7 @@ function ProjectsContent() {
 
 
       {/* Projects Grid */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 max-w-7xl mx-auto">
         {loading
           ? Array.from({ length: 3 }).map((_, idx) => (
             <ProjectSkeletonCard key={idx} />
@@ -225,7 +235,7 @@ function ProjectsContent() {
 // 3. Export the wrapper component
 export default function RoadmapProjects() {
   return (
-    <Suspense fallback={<div>Loading project generator...</div>}>
+    <Suspense fallback={<div className="py-20 text-center text-gray-500">Loading project generator...</div>}>
       <ProjectsContent />
     </Suspense>
   );

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import api from "@/utils/api";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/context/AuthContext";
 import { ResourceItem } from "@/components/ResourceCard";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectTrigger,
@@ -13,9 +13,8 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import {
-  Search,
+  ArrowLeft,
   Filter,
   VideoIcon,
   BookIcon,
@@ -27,8 +26,7 @@ export default function ViewAllResources() {
   const { id } = useParams();
   const router = useRouter();
 
-  // ✅ NextAuth
-  const { data: session, status } = useSession();
+  const { status } = useAuth();
   const isLoggedIn = status === "authenticated";
 
   const [resources, setResources] = useState([]);
@@ -45,7 +43,7 @@ export default function ViewAllResources() {
   useEffect(() => {
     // 🔐 Redirect if not logged in
     if (status === "unauthenticated") {
-      router.push("/");
+      router.replace(`/login?callbackUrl=${encodeURIComponent(`/resource/milestone/${id}`)}`);
       return;
     }
 
@@ -97,153 +95,168 @@ export default function ViewAllResources() {
     { value: "course", label: "Courses", icon: GraduationCapIcon },
   ];
 
-  const currentIcon =
-    typeFilters.find((f) => f.value === filterType)?.icon || Filter;
-  const CurrentIcon = currentIcon;
+  const hasActiveFilters =
+    Boolean(searchQuery) || filterType !== "all" || difficultyFilter !== "all";
+
+  const roadmapId = milestone?.roadmap?._id || milestone?.roadmap;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {/* Milestone Header */}
-      <h1 className="text-2xl font-bold text-[#339999] mt-4 mb-2">
-        {milestone?.order && (
-          <span className="text-[#339999] bg-clip-text font-bold">
-            Milestone {milestone.order}:
-          </span>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
+        {roadmapId && typeof roadmapId === "string" && (
+          <Link
+            href={`/roadmap/${roadmapId}`}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-[#267373]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {milestone?.roadmap?.title ? `Back to ${milestone.roadmap.title}` : "Back to roadmap"}
+          </Link>
         )}
-        {milestone?.title || "Milestone Resources"}
-      </h1>
-      <p className="text-gray-600 mb-6">{milestone?.description}</p>
 
-      {/* Filters Row */}
-      <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-6">
-        {/* Resource Type Buttons */}
-        <div className="flex gap-3 flex-wrap">
-          {typeFilters
-            .filter((f) => f.value !== "all")
-            .map((filter) => {
-              const Icon = filter.icon;
-              const isActive = filterType === filter.value;
-              const count = typeCounts[filter.value] || 0;
+        {/* Milestone Header */}
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#339999] mb-2">
+          {milestone?.order && (
+            <span className="text-[#339999] font-bold">
+              Milestone {milestone.order}:{" "}
+            </span>
+          )}
+          {milestone?.title || "Milestone Resources"}
+        </h1>
+        <p className="text-gray-600 mb-6 text-sm sm:text-base">{milestone?.description}</p>
 
-              return (
-                <button
-                  key={filter.value}
-                  onClick={() => setFilterType(filter.value)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-left transition-all ${
-                    isActive
-                      ? "bg-[#0c0c1d] text-white"
-                      : " border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-300"
-                  }`}
-                >
-                  <Icon
-                    className={`w-4 h-4 ${
-                      isActive ? "text-white" : "text-gray-700"
+        {/* Filters Row */}
+        <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-2">
+          {/* Resource Type Buttons */}
+          <div className="flex gap-2 sm:gap-3 flex-wrap">
+            {typeFilters
+              .filter((f) => f.value !== "all")
+              .map((filter) => {
+                const Icon = filter.icon;
+                const isActive = filterType === filter.value;
+                const count = typeCounts[filter.value] || 0;
+
+                return (
+                  <button
+                    key={filter.value}
+                    onClick={() => setFilterType(isActive ? "all" : filter.value)}
+                    aria-pressed={isActive}
+                    className={`flex items-center gap-2 px-3 py-2 sm:px-4 rounded-xl border text-left transition-all ${
+                      isActive
+                        ? "border-[#0c0c1d] bg-[#0c0c1d] text-white shadow-sm"
+                        : "border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:bg-gray-100"
                     }`}
-                  />
-                  <div>
-                    <div className="text-sm font-medium">{filter.label}</div>
-                    <div className="text-xs opacity-70">
-                      {count} {count === 1 ? "item" : "items"}
+                  >
+                    <Icon
+                      className={`w-4 h-4 ${
+                        isActive ? "text-white" : "text-gray-600"
+                      }`}
+                    />
+                    <div>
+                      <div className="text-sm font-medium leading-tight">{filter.label}</div>
+                      <div className="text-xs opacity-70">
+                        {count} {count === 1 ? "item" : "items"}
+                      </div>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
+          </div>
+
+          {/* Difficulty Filter */}
+          <div className="w-full sm:w-44">
+            <Select
+              value={difficultyFilter}
+              onValueChange={(val) => setDifficultyFilter(val)}
+            >
+              <SelectTrigger className="bg-white border-gray-200 w-full data-[size=default]:h-10">
+                <SelectValue placeholder="Difficulty" />
+              </SelectTrigger>
+              <SelectContent className="bg-white shadow-lg border border-gray-200">
+                {difficultyFilters.map((filter) => (
+                  <SelectItem key={filter} value={filter}>
+                    {filter === "all"
+                      ? "All Levels"
+                      : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Difficulty Filter */}
-        <div className="w-40">
-          <Select
-            value={difficultyFilter}
-            onValueChange={(val) => setDifficultyFilter(val)}
-          >
-            <SelectTrigger className="bg-gray-100 w-full">
-              <SelectValue placeholder="Difficulty" />
-            </SelectTrigger>
-            <SelectContent className="bg-white shadow-lg border border-gray-200">
-              {difficultyFilters.map((filter) => (
-                <SelectItem key={filter} value={filter}>
-                  {filter === "all"
-                    ? "All Levels"
-                    : filter.charAt(0).toUpperCase() + filter.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Results Summary */}
+        <div className="flex min-h-[3.5rem] items-center justify-between py-3">
+          <p className="text-sm text-gray-500">
+            Showing {filteredResources.length} of {resources.length} resources
+          </p>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setFilterType("all");
+                setDifficultyFilter("all");
+              }}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
-      </div>
 
-      {/* Results Summary */}
-      <div className="flex items-center justify-between py-5">
-        <p className="text-sm text-muted-foreground">
-          Showing {filteredResources.length} of {resources.length} resources
-        </p>
-
-        {(searchQuery || filterType !== "all") && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSearchQuery("");
-              setFilterType("all");
-              setDifficultyFilter("all");
-            }}
-            className="hover:bg-gray-100"
-          >
-            Clear filters
-          </Button>
+        {/* Resource List with Skeleton */}
+        {loading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-24 sm:h-28 w-full bg-gray-200 rounded-xl animate-pulse"
+              />
+            ))}
+          </div>
+        ) : filteredResources.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-10 text-center text-gray-500">
+            No matching resources found.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {filteredResources.map((res) => (
+              <div
+                key={res._id}
+                className={`rounded-xl cursor-pointer transition-shadow ${
+                  clickedResourceId === res._id
+                    ? "ring-2 ring-[#339999]/50"
+                    : ""
+                }`}
+                onClick={() => {
+                  setClickedResourceId(
+                    clickedResourceId === res._id ? null : res._id
+                  );
+                  if (res.url) window.open(res.url, "_blank");
+                  setTimeout(() => setClickedResourceId(null), 2000);
+                }}
+              >
+                <ResourceItem
+                  resource={{
+                    id: res._id,
+                    title: res.title,
+                    description: res.description,
+                    author: res.author,
+                    url: res.url,
+                    type: res.type,
+                    tags: res.tags || [],
+                    duration: res.duration || "",
+                    difficulty: res.difficulty || undefined,
+                    step: res.step || 0,
+                    isOptional: res.isOptional || false,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         )}
       </div>
-
-      {/* Resource List with Skeleton */}
-      {loading ? (
-        <div className="space-y-4">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="h-20 sm:h-24 w-full bg-gray-100 rounded-lg animate-pulse p-4"
-            />
-          ))}
-        </div>
-      ) : filteredResources.length === 0 ? (
-        <p className="text-gray-500">No matching resources found.</p>
-      ) : (
-        <div className="space-y-4">
-          {filteredResources.map((res) => (
-            <div
-              key={res._id}
-              className={`rounded-lg transition-colors cursor-pointer p-4 sm:p-6 ${
-                clickedResourceId === res._id
-                  ? "bg-gray-100"
-                  : "bg-transparent"
-              }`}
-              onClick={() => {
-                setClickedResourceId(
-                  clickedResourceId === res._id ? null : res._id
-                );
-                if (res.url) window.open(res.url, "_blank");
-                setTimeout(() => setClickedResourceId(null), 2000);
-              }}
-            >
-              <ResourceItem
-                resource={{
-                  id: res._id,
-                  title: res.title,
-                  description: res.description,
-                  author: res.author,
-                  url: res.url,
-                  type: res.type,
-                  tags: res.tags || [],
-                  duration: res.duration || "",
-                  difficulty: res.difficulty || undefined,
-                  step: res.step || 0,
-                  isOptional: res.isOptional || false,
-                }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
