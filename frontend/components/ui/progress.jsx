@@ -10,7 +10,7 @@ export function Progress({ className, indicatorClassName, value = 0, ...props })
   return (
     <ProgressPrimitive.Root
       value={safeValue}
-      className={cn("bg-gray-200 h-3 w-full rounded-full overflow-hidden", className)}
+      className={cn("bg-gray-200 dark:bg-gray-700 h-3 w-full rounded-full overflow-hidden", className)}
       {...props}
     >
       <ProgressPrimitive.Indicator

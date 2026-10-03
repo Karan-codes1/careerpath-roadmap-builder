@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const config = {
+  // Dark styles (`dark:` classes) apply when <html> has the class "dark"
+  darkMode: 'class',
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",

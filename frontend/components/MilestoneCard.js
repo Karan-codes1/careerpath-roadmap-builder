@@ -24,15 +24,15 @@ export function StatusIcon({ status, onClick }) {
 
   switch (safeStatus) {
     case 'completed':
-      return <CheckCircle onClick={onClick} className={`${baseClasses} text-green-500`} />
+      return <CheckCircle onClick={onClick} className={`${baseClasses} text-green-500 dark:text-green-400`} />
     case 'in_progress':
-      return <Clock onClick={onClick} className={`${baseClasses} text-blue-500`} />
+      return <Clock onClick={onClick} className={`${baseClasses} text-blue-500 dark:text-blue-400`} />
     case 'not_started':
-      return <Circle onClick={onClick} className={`${baseClasses} text-indigo-500`} />
+      return <Circle onClick={onClick} className={`${baseClasses} text-indigo-500 dark:text-indigo-400`} />
     case 'locked':
-      return <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+      return <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 dark:text-gray-500" />
     default:
-      return <Circle onClick={onClick} className={`${baseClasses} text-gray-300`} />
+      return <Circle onClick={onClick} className={`${baseClasses} text-gray-300 dark:text-gray-600`} />
   }
 }
 
@@ -43,10 +43,10 @@ export function StatusBadge({ status }) {
   const safeStatus = normalizeStatus(status)
 
   const variants = {
-    completed: 'bg-green-100 text-green-700',
-    in_progress: 'bg-blue-100 text-blue-700',
-    locked: 'bg-gray-100 text-gray-500',
-    not_started: 'bg-indigo-100 text-indigo-700',
+    completed: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
+    in_progress: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+    locked: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400',
+    not_started: 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300',
   }
 
   const formattedStatus =
@@ -58,7 +58,7 @@ export function StatusBadge({ status }) {
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md px-2 py-0.5 text-[10px] font-medium sm:text-xs ${variants[safeStatus] || 'bg-gray-100 text-gray-500'}`}
+      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md px-2 py-0.5 text-[10px] font-medium sm:text-xs ${variants[safeStatus] || 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}`}
     >
       {formattedStatus}
     </span>
@@ -85,10 +85,10 @@ export default function MilestoneCard({ milestone, index, onComplete, onOpen }) 
       onClick={handleNavigate}
       className={`group rounded-xl border p-3 shadow-sm transition-all duration-200 sm:p-4 ${
         isLocked
-          ? 'cursor-not-allowed border-gray-200 bg-white opacity-60'
+          ? 'cursor-not-allowed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 opacity-60'
           : isCompleted
-            ? 'cursor-pointer border-green-200 bg-green-50/50 hover:shadow-md'
-            : 'cursor-pointer border-gray-200 bg-white hover:border-[#339999]/60 hover:shadow-md'
+            ? 'cursor-pointer border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-950/30 hover:shadow-md'
+            : 'cursor-pointer border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-[#339999]/60 hover:shadow-md'
       }`}
     >
       <div className="flex items-start gap-3 sm:gap-4">
@@ -104,7 +104,7 @@ export default function MilestoneCard({ milestone, index, onComplete, onOpen }) 
           }}
           title={isCompleted ? 'Mark as not completed' : 'Mark as completed'}
           aria-label={isCompleted ? 'Mark as not completed' : 'Mark as completed'}
-          className="mt-0.5 flex-shrink-0 rounded-full p-1 transition-colors hover:bg-gray-100 disabled:hover:bg-transparent"
+          className="mt-0.5 flex-shrink-0 rounded-full p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 disabled:hover:bg-transparent"
         >
           <StatusIcon status={safeStatus} />
         </button>
@@ -114,7 +114,7 @@ export default function MilestoneCard({ milestone, index, onComplete, onOpen }) 
           <div className="flex items-start justify-between gap-3">
             <h3
               className={`text-sm font-semibold sm:text-base ${
-                isCompleted ? 'text-gray-700' : 'text-gray-900'
+                isCompleted ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-gray-100'
               }`}
             >
               {index + 1}. {milestone.title}
@@ -122,13 +122,13 @@ export default function MilestoneCard({ milestone, index, onComplete, onOpen }) 
             <StatusBadge status={safeStatus} />
           </div>
 
-          <p className="mt-1 text-xs text-gray-600 sm:text-sm">
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
             {milestone.description}
           </p>
 
           {/* Details */}
           {milestone.duration && (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 sm:text-sm">
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
               <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {milestone.duration}
             </div>
@@ -151,7 +151,7 @@ export default function MilestoneCard({ milestone, index, onComplete, onOpen }) 
         </div>
 
         {!isLocked && (
-          <ChevronRight className="hidden h-5 w-5 flex-shrink-0 self-center text-gray-300 transition-colors group-hover:text-[#339999] sm:block" />
+          <ChevronRight className="hidden h-5 w-5 flex-shrink-0 self-center text-gray-300 dark:text-gray-600 transition-colors group-hover:text-[#339999] sm:block" />
         )}
       </div>
     </div>

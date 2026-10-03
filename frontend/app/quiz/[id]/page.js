@@ -63,11 +63,11 @@ export default function QuizPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4 flex justify-center">
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 dark:from-gray-950 to-gray-100 dark:to-gray-900 py-6 px-4 flex justify-center">
                 <div className="w-full max-w-2xl md:max-w-4xl animate-pulse space-y-4">
-                    <div className="h-24 rounded-2xl bg-gray-200" />
-                    <div className="h-72 rounded-2xl bg-gray-200" />
-                    <p className="text-center text-sm text-gray-500">Loading quiz...</p>
+                    <div className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-72 rounded-2xl bg-gray-200 dark:bg-gray-700" />
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">Loading quiz...</p>
                 </div>
             </div>
         )
@@ -75,13 +75,13 @@ export default function QuizPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4">
+            <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 dark:bg-gray-950 px-4">
                 <img
                     src="/undraw_page-not-found_6wni.svg"
                     alt="Not Found"
                     className="w-64 md:w-80 mb-6"
                 />
-                <p className="text-gray-600 text-base md:text-lg font-medium text-center">{error}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg font-medium text-center">{error}</p>
             </div>
         )
     }
@@ -94,7 +94,7 @@ export default function QuizPage() {
 
     if (showResults) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4 flex justify-center">
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 dark:from-gray-950 to-gray-100 dark:to-gray-900 py-8 px-4 flex justify-center">
                 <QuizResults
                     score={calculateScore()}
                     total={quiz.questions.length}
@@ -113,7 +113,7 @@ export default function QuizPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4 flex justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 dark:from-gray-950 to-gray-100 dark:to-gray-900 py-6 px-4 flex justify-center">
             <div className="w-full max-w-2xl md:max-w-4xl">
                 {/* Header + Progress */}
                 <div className="mb-4 rounded-2xl bg-[#339999] p-4 text-white shadow-lg md:mb-6 md:p-6">
@@ -130,14 +130,14 @@ export default function QuizPage() {
                         </div>
                         <Progress
                             value={progress}
-                            className="h-2 md:h-2.5 bg-white/30"
+                            className="h-2 md:h-2.5 bg-white/30 dark:bg-white/30"
                             indicatorClassName="bg-white"
                         />
                     </div>
                 </div>
 
                 {/* Question Card */}
-                <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-md md:p-8">
+                <div className="mb-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-md md:p-8">
                     <Question
                         question={currentQ}
                         questionNumber={currentIndex + 1}
@@ -153,8 +153,8 @@ export default function QuizPage() {
                         disabled={currentIndex === 0}
                         onClick={prevQuestion}
                         className={`flex-1 px-3 py-2.5 rounded-xl flex items-center justify-center gap-2 border text-sm font-medium transition-colors
-                          ${currentIndex === 0 ? "bg-gray-200 text-gray-400 cursor-not-allowed" :
-                                "bg-white hover:bg-gray-100 text-gray-700"}`}
+                          ${currentIndex === 0 ? "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed" :
+                                "bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"}`}
                     >
                         <ArrowLeft className="w-4 h-4" /> Previous
                     </button>
@@ -162,7 +162,7 @@ export default function QuizPage() {
                     <div className="flex gap-2 flex-1">
                         <button
                             onClick={() => clearAnswer(currentQ._id)}
-                            className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center justify-center gap-2 transition-colors"
+                            className="flex-1 px-3 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center gap-2 transition-colors"
                         >
                             <RotateCcw className="w-4 h-4" /> Clear
                         </button>
@@ -187,9 +187,9 @@ export default function QuizPage() {
                                 title={`Go to Question ${idx + 1}`}
                                 className={`
                                     w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300
-                                    ${isCurrent ? "bg-[#267373] text-white hover:bg-[#1F5C5C] ring-2 ring-[#267373]/30 ring-offset-2"  :
+                                    ${isCurrent ? "bg-[#267373] text-white hover:bg-[#1F5C5C] ring-2 ring-[#267373]/30 ring-offset-2 dark:ring-offset-gray-950"  :
                                         isAnswered ? "bg-[#339999] text-white hover:bg-[#2B8080]"  :
-                                            "bg-gray-200 text-gray-700 hover:bg-gray-300"}
+                                            "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"}
                                 `}
                             >
                                 {idx + 1}

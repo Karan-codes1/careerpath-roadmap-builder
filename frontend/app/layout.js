@@ -24,11 +24,27 @@ export const metadata = {
   },
 };
 
+// Runs before the page paints, so a saved dark theme never flashes light first.
+// Uses the saved choice if there is one, otherwise the device's own setting.
+const themeScript = `
+(function () {
+  try {
+    var saved = localStorage.getItem('theme');
+    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (dark) document.documentElement.classList.add('dark');
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the script above may add class="dark" before React loads
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
      <body
-       className={`${inter.className} ${jetbrainsMono.variable} antialiased`}
+       className={`${inter.className} ${jetbrainsMono.variable} antialiased dark:bg-gray-950 dark:text-gray-100`}
     >
         <ClientProviders>
           <Navbar />

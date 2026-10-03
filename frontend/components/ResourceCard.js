@@ -9,23 +9,23 @@ export function ResourceItem({ resource }) {
     };
 
     const getTypeColor = (type) => {
-        if (typeof type !== "string") return "bg-gray-100 text-gray-800";
+        if (typeof type !== "string") return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
         switch (type.toLowerCase()) {
-            case "video": return "bg-red-100 text-red-800";
-            case "article": return "bg-blue-100 text-blue-800";
-            case "book": return "bg-green-100 text-green-800";
-            case "course": return "bg-purple-100 text-purple-800";
-            default: return "bg-gray-100 text-gray-800";
+            case "video": return "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300";
+            case "article": return "bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300";
+            case "book": return "bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300";
+            case "course": return "bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300";
+            default: return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
         }
     };
 
     const getDifficultyColor = (difficulty) => {
-        if (typeof difficulty !== "string") return "bg-gray-100 text-gray-800";
+        if (typeof difficulty !== "string") return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
         switch (difficulty.toLowerCase()) {
-            case "beginner": return "bg-green-100 text-green-800";
-            case "intermediate": return "bg-yellow-100 text-yellow-800";
-            case "advanced": return "bg-red-100 text-red-800";
-            default: return "bg-gray-100 text-gray-800";
+            case "beginner": return "bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300";
+            case "intermediate": return "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300";
+            case "advanced": return "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300";
+            default: return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
         }
     };
 
@@ -37,7 +37,7 @@ export function ResourceItem({ resource }) {
     const hasTags = Array.isArray(resource.tags) && resource.tags.length > 0;
 
     return (
-        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#339999]/60 hover:shadow-md sm:p-5">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm transition-all duration-200 hover:border-[#339999]/60 hover:shadow-md sm:p-5">
             <div className="flex items-start gap-3 sm:gap-4">
 
                 {/* Type icon */}
@@ -49,12 +49,12 @@ export function ResourceItem({ resource }) {
 
                     {/* Title row */}
                     <div className="flex items-start gap-2">
-                        <h3 className="mr-auto text-sm font-semibold leading-snug text-gray-900 sm:text-base">
+                        <h3 className="mr-auto text-sm font-semibold leading-snug text-gray-900 dark:text-gray-100 sm:text-base">
                             {resource.title || "Untitled"}
                         </h3>
 
                         {resource.isOptional && (
-                            <span className="shrink-0 rounded-md border border-yellow-300 bg-yellow-50 px-2 py-0.5 text-[10px] font-medium text-yellow-700 sm:text-xs">
+                            <span className="shrink-0 rounded-md border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-950/40 px-2 py-0.5 text-[10px] font-medium text-yellow-700 dark:text-yellow-300 sm:text-xs">
                                 Optional
                             </span>
                         )}
@@ -66,13 +66,13 @@ export function ResourceItem({ resource }) {
 
                     {/* Description */}
                     {resource.description && (
-                        <p className="text-xs leading-relaxed text-gray-600 sm:text-sm">
+                        <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400 sm:text-sm">
                             {resource.description}
                         </p>
                     )}
 
                     {/* Author, Duration, Difficulty */}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 sm:text-sm">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                         {resource.author && <span>By {resource.author}</span>}
                         {resource.duration && (
                             <span className="flex items-center gap-1">
@@ -94,7 +94,7 @@ export function ResourceItem({ resource }) {
                                 {hasTags && resource.tags.map((tag, index) => (
                                     <span
                                         key={index}
-                                        className="rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-medium text-gray-600 sm:text-xs"
+                                        className="rounded-md border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:text-gray-400 sm:text-xs"
                                     >
                                         {tag}
                                     </span>
@@ -106,7 +106,7 @@ export function ResourceItem({ resource }) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[#339999] hover:text-[#267373] sm:text-sm"
+                                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-700 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors hover:border-[#339999] hover:text-[#267373] dark:hover:text-[#5fc9c9] sm:text-sm"
                                 >
                                     <ExternalLink className="h-3.5 w-3.5" />
                                     View Resource

@@ -101,12 +101,12 @@ export default function ViewAllResources() {
   const roadmapId = milestone?.roadmap?._id || milestone?.roadmap;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
         {roadmapId && typeof roadmapId === "string" && (
           <Link
             href={`/roadmap/${roadmapId}`}
-            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-[#267373]"
+            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:text-[#267373] dark:hover:text-[#5fc9c9]"
           >
             <ArrowLeft className="h-4 w-4" />
             {milestone?.roadmap?.title ? `Back to ${milestone.roadmap.title}` : "Back to roadmap"}
@@ -122,7 +122,7 @@ export default function ViewAllResources() {
           )}
           {milestone?.title || "Milestone Resources"}
         </h1>
-        <p className="text-gray-600 mb-6 text-sm sm:text-base">{milestone?.description}</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm sm:text-base">{milestone?.description}</p>
 
         {/* Filters Row */}
         <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 mb-2">
@@ -142,13 +142,13 @@ export default function ViewAllResources() {
                     aria-pressed={isActive}
                     className={`flex items-center gap-2 px-3 py-2 sm:px-4 rounded-xl border text-left transition-all ${
                       isActive
-                        ? "border-[#0c0c1d] bg-[#0c0c1d] text-white shadow-sm"
-                        : "border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:bg-gray-100"
+                        ? "border-[#0c0c1d] dark:border-gray-100 bg-[#0c0c1d] dark:bg-gray-100 dark:text-gray-900 text-white shadow-sm"
+                        : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                   >
                     <Icon
                       className={`w-4 h-4 ${
-                        isActive ? "text-white" : "text-gray-600"
+                        isActive ? "text-white dark:text-gray-900" : "text-gray-600 dark:text-gray-400"
                       }`}
                     />
                     <div>
@@ -168,10 +168,10 @@ export default function ViewAllResources() {
               value={difficultyFilter}
               onValueChange={(val) => setDifficultyFilter(val)}
             >
-              <SelectTrigger className="bg-white border-gray-200 w-full data-[size=default]:h-10">
+              <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 w-full data-[size=default]:h-10">
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
-              <SelectContent className="bg-white shadow-lg border border-gray-200">
+              <SelectContent className="bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-800">
                 {difficultyFilters.map((filter) => (
                   <SelectItem key={filter} value={filter}>
                     {filter === "all"
@@ -186,7 +186,7 @@ export default function ViewAllResources() {
 
         {/* Results Summary */}
         <div className="flex min-h-[3.5rem] items-center justify-between py-3">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {filteredResources.length} of {resources.length} resources
           </p>
 
@@ -198,7 +198,7 @@ export default function ViewAllResources() {
                 setFilterType("all");
                 setDifficultyFilter("all");
               }}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
             >
               Clear filters
             </button>
@@ -211,12 +211,12 @@ export default function ViewAllResources() {
             {Array.from({ length: 5 }).map((_, idx) => (
               <div
                 key={idx}
-                className="h-24 sm:h-28 w-full bg-gray-200 rounded-xl animate-pulse"
+                className="h-24 sm:h-28 w-full bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"
               />
             ))}
           </div>
         ) : filteredResources.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-10 text-center text-gray-500">
+          <p className="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-10 text-center text-gray-500 dark:text-gray-400">
             No matching resources found.
           </p>
         ) : (

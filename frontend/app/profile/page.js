@@ -20,16 +20,16 @@ export default function ProfilePage() {
   const initial = (user?.name || user?.email || '?').charAt(0).toUpperCase()
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Profile Page</h1>
-        <div className="mt-6 flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-3xl">Profile Page</h1>
+        <div className="mt-6 flex items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#339999] text-xl font-semibold text-white">
             {initial}
           </div>
           <div className="min-w-0">
-            <p className="text-lg font-semibold text-gray-900">Welcome back, {user?.name}!</p>
-            <p className="truncate text-sm text-gray-600">{user?.email}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">Welcome back, {user?.name}!</p>
+            <p className="truncate text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
           </div>
         </div>
       </div>
