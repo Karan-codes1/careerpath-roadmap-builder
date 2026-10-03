@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import api from '@/utils/api'
 import QuizResults from '@/components/QuizResults'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import Question from '@/components/Question'
 import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react"
@@ -62,7 +61,17 @@ export default function QuizPage() {
         }, 0)
     }
 
-    if (loading) return <div className="text-center mt-20 text-gray-500">Loading quiz...</div>
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4 flex justify-center">
+                <div className="w-full max-w-2xl md:max-w-4xl animate-pulse space-y-4">
+                    <div className="h-24 rounded-2xl bg-gray-200" />
+                    <div className="h-72 rounded-2xl bg-gray-200" />
+                    <p className="text-center text-sm text-gray-500">Loading quiz...</p>
+                </div>
+            </div>
+        )
+    }
 
     if (error) {
         return (
@@ -91,6 +100,8 @@ export default function QuizPage() {
                     total={quiz.questions.length}
                     answers={answers}
                     questions={quiz.questions}
+                    title={quiz.title}
+                    roadmapId={id}
                     onRestart={() => {
                         setCurrentIndex(0)
                         setAnswers([])
@@ -102,71 +113,69 @@ export default function QuizPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-2 flex justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4 flex justify-center">
             <div className="w-full max-w-2xl md:max-w-4xl">
                 {/* Header + Progress */}
-                <Card className="shadow-xl rounded-2xl overflow-hidden mb-4 md:mb-6">
-                    <CardHeader className="bg-[#339999] text-white p-4 md:p-5">
-                        <CardTitle className="flex justify-between items-center font-semibold text-base md:text-lg">
-                            <span>{quiz.title}</span>
-                            <span className="text-xs md:text-sm">
-                                Question {currentIndex + 1} / {quiz.questions.length}
-                            </span>
-                        </CardTitle>
-                        <div className="mt-2">
-                            <div className="flex justify-between text-xs text-gray-200 mb-1">
-                                <span>{Math.round(progress)}% completed</span>
-                            </div>
-                            <Progress
-                                value={progress}
-                                className="h-2 md:h-3 rounded-full bg-gray-300"
-                            />
+                <div className="mb-4 rounded-2xl bg-[#339999] p-4 text-white shadow-lg md:mb-6 md:p-6">
+                    <div className="flex items-center justify-between gap-3 font-semibold">
+                        <h1 className="text-base md:text-xl">{quiz.title}</h1>
+                        <span className="shrink-0 rounded-full bg-white/15 px-3 py-1 text-xs md:text-sm">
+                            Question {currentIndex + 1} / {quiz.questions.length}
+                        </span>
+                    </div>
+                    <div className="mt-3">
+                        <div className="mb-1.5 flex justify-between text-xs text-white/85">
+                            <span>{Math.round(progress)}% completed</span>
+                            <span>{answers.length} of {quiz.questions.length} answered</span>
                         </div>
-                    </CardHeader>
-                </Card>
+                        <Progress
+                            value={progress}
+                            className="h-2 md:h-2.5 bg-white/30"
+                            indicatorClassName="bg-white"
+                        />
+                    </div>
+                </div>
 
                 {/* Question Card */}
-                <Card className="shadow-md rounded-2xl p-4 md:p-6 mb-4">
-                    <CardContent>
-                        <Question
-                            question={currentQ}
-                            questionNumber={currentIndex + 1}
-                            selectedOption={userAnswer}
-                            onAnswerSelect={(option) => handleAnswer(currentQ._id, option)}
-                            userAnswer={userAnswer}
-                        />
-                    </CardContent>
-                </Card>
+                <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-md md:p-8">
+                    <Question
+                        question={currentQ}
+                        questionNumber={currentIndex + 1}
+                        selectedOption={userAnswer}
+                        onAnswerSelect={(option) => handleAnswer(currentQ._id, option)}
+                        userAnswer={userAnswer}
+                    />
+                </div>
 
                 {/* Navigation Buttons */}
                 <div className="flex flex-col sm:flex-row justify-between mt-4 gap-2">
                     <button
                         disabled={currentIndex === 0}
                         onClick={prevQuestion}
-                        className={`flex-1 px-3 py-2 rounded-xl flex items-center justify-center gap-2 border 
+                        className={`flex-1 px-3 py-2.5 rounded-xl flex items-center justify-center gap-2 border text-sm font-medium transition-colors
                           ${currentIndex === 0 ? "bg-gray-200 text-gray-400 cursor-not-allowed" :
                                 "bg-white hover:bg-gray-100 text-gray-700"}`}
                     >
                         <ArrowLeft className="w-4 h-4" /> Previous
                     </button>
 
-                    <div className="flex gap-2 flex-1 mt-2 sm:mt-0">
+                    <div className="flex gap-2 flex-1">
                         <button
                             onClick={() => clearAnswer(currentQ._id)}
-                            className="flex-1 px-3 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 flex items-center justify-center gap-2"
+                            className="flex-1 px-3 py-2.5 rounded-xl bg-white border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center justify-center gap-2 transition-colors"
                         >
                             <RotateCcw className="w-4 h-4" /> Clear
                         </button>
 
                         <button
                             onClick={nextQuestion}
-                            className="flex-1 px-3 py-2 rounded-xl bg-[#339999] text-white hover:bg-[#2B8080] flex items-center justify-center gap-2"
+                            className="flex-1 px-3 py-2.5 rounded-xl bg-[#339999] text-sm font-medium text-white hover:bg-[#2B8080] flex items-center justify-center gap-2 transition-colors"
                         >
                             {currentIndex === quiz.questions.length - 1 ? "Finish" : "Next"} <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
-                <div className="flex flex-wrap justify-center mt-4 gap-2">
+                <div className="flex flex-wrap justify-center mt-5 gap-2">
                     {quiz.questions.map((q, idx) => {
                         const isAnswered = answers.some(a => a.questionId === q._id)
                         const isCurrent = idx === currentIndex
@@ -178,7 +187,7 @@ export default function QuizPage() {
                                 title={`Go to Question ${idx + 1}`}
                                 className={`
                                     w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-medium transition-all duration-300
-                                    ${isCurrent ? "bg-[#267373] text-white hover:bg-[#1F5C5C]"  :
+                                    ${isCurrent ? "bg-[#267373] text-white hover:bg-[#1F5C5C] ring-2 ring-[#267373]/30 ring-offset-2"  :
                                         isAnswered ? "bg-[#339999] text-white hover:bg-[#2B8080]"  :
                                             "bg-gray-200 text-gray-700 hover:bg-gray-300"}
                                 `}

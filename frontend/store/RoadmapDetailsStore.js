@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import api from '@/utils/api'
-import { getSession } from 'next-auth/react'
 
 export const RoadmapDetailsStore = create((set, get) => ({
   roadmapData: {},
@@ -9,13 +8,6 @@ export const RoadmapDetailsStore = create((set, get) => ({
   fetchRoadmapDetails: async (id) => {
     const { roadmapData, loading } = get()
     if (!id || roadmapData[id] || loading) return
-
-    // 🔐 HARD BLOCK UNTIL SESSION EXISTS
-    const session = await getSession()
-    if (!session?.user?.id) {
-      console.warn('[RoadmapStore] Session not ready, skipping fetch')
-      return
-    }
 
     set({ loading: true })
 

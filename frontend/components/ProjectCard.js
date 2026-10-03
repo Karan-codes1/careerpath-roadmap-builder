@@ -1,8 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { ExternalLink, Star, Clock, Users } from "lucide-react";
+import { Star, Clock, Users } from "lucide-react";
 
-export default function ProjectCard({  
+export default function ProjectCard({
   title,
   description,
   requiredSkills,
@@ -21,59 +19,58 @@ export default function ProjectCard({
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow duration-200 p-4 md:p-6">
-      <CardHeader className="p-0">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <CardTitle className="mb-2 font-semibold">{title}</CardTitle>
-            <CardDescription className="text-muted-foreground text-gray-500">
-              {description}
-            </CardDescription>
-          </div>
-          <Badge variant="outline" className={getDifficultyColor(difficulty)}>
-            {difficulty}
-          </Badge>
-        </div>
+    <div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-lg md:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-base font-semibold leading-snug text-gray-900 md:text-lg">{title}</h3>
+        <span
+          className={`shrink-0 whitespace-nowrap rounded-md border px-2 py-0.5 text-xs font-medium ${getDifficultyColor(difficulty)}`}
+        >
+          {difficulty}
+        </span>
+      </div>
 
-        <div className="flex items-center gap-4 pt-2">
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-500">{duration}</span>
-          </div>
-          {popularity !== undefined && (
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Users className="w-4 h-4" />
-              <span className="text-sm">{popularity} builders</span>
-            </div>
-          )}
-        </div>
-      </CardHeader>
+      <p className="mt-2 text-sm leading-relaxed text-gray-600">{description}</p>
 
-      <CardContent className="space-y-4 p-2 md:p-4">
+      <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
+        <div className="flex items-center gap-1.5">
+          <Clock className="w-4 h-4" />
+          <span>{duration}</span>
+        </div>
+        {popularity !== undefined && (
+          <div className="flex items-center gap-1.5">
+            <Users className="w-4 h-4" />
+            <span>{popularity} builders</span>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
         <div>
-          <h4 className="mb-2 text-muted-foreground text-gray-500">Required Skills</h4>
+          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Required Skills</h4>
           <div className="flex flex-wrap gap-2">
-            {requiredSkills.map((skill, index) => (
-              <Badge key={index} variant="secondary" className="text-xs border bg-gray-100 border-gray-300 rounded-full px-2 py-0.5">
+            {(requiredSkills || []).map((skill, index) => (
+              <span
+                key={index}
+                className="rounded-full border border-gray-300 bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"
+              >
                 {skill}
-              </Badge>
+              </span>
             ))}
           </div>
         </div>
 
         <div>
-          <h4 className="mb-2 text-muted-foreground text-gray-500">Key Features</h4>
-          <ul className="space-y-1">
-            {keyFeatures.map((feature, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm">
-                <Star className="w-3 h-3 mt-1 text-primary shrink-0" />
+          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Key Features</h4>
+          <ul className="space-y-1.5">
+            {(keyFeatures || []).map((feature, index) => (
+              <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                <Star className="mt-1 h-3 w-3 shrink-0 text-[#339999]" />
                 <span>{feature}</span>
               </li>
             ))}
           </ul>
         </div>
-
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

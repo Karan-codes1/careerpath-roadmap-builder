@@ -1,8 +1,6 @@
 'use client'
 
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Clock, CheckCircle, Circle, Lock } from 'lucide-react'
+import { Clock, CheckCircle, Circle, Lock, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Progress } from '@/components/ui/progress'
 
@@ -21,25 +19,20 @@ const normalizeStatus = (status) => {
 --------------------------------------------------- */
 export function StatusIcon({ status, onClick }) {
   const safeStatus = normalizeStatus(status)
-  const baseClasses = 'w-4 h-4 sm:w-5 sm:h-5'
   const isClickable = typeof onClick === 'function'
-
-  const iconProps = {
-    className: `${baseClasses} ${isClickable ? 'cursor-pointer' : ''}`,
-    onClick,
-  }
+  const baseClasses = `w-5 h-5 sm:w-6 sm:h-6 ${isClickable ? 'cursor-pointer' : ''}`
 
   switch (safeStatus) {
     case 'completed':
-      return <CheckCircle {...iconProps} className={`${baseClasses} text-green-500`} />
+      return <CheckCircle onClick={onClick} className={`${baseClasses} text-green-500`} />
     case 'in_progress':
-      return <Clock {...iconProps} className={`${baseClasses} text-blue-500`} />
+      return <Clock onClick={onClick} className={`${baseClasses} text-blue-500`} />
     case 'not_started':
-      return <Circle {...iconProps} className={`${baseClasses} text-indigo-500`} />
+      return <Circle onClick={onClick} className={`${baseClasses} text-indigo-500`} />
     case 'locked':
-      return <Lock className={`${baseClasses} text-gray-400`} />
+      return <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
     default:
-      return <Circle {...iconProps} className={`${baseClasses} text-gray-300`} />
+      return <Circle onClick={onClick} className={`${baseClasses} text-gray-300`} />
   }
 }
 
@@ -64,16 +57,11 @@ export function StatusBadge({ status }) {
         : safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)
 
   return (
-    <Badge
-      className={`
-        ${variants[safeStatus]}
-        text-[9px] sm:text-[10px] md:text-xs
-        py-0.5 px-1 sm:py-0.5 sm:px-1.5 md:py-1 md:px-2
-        rounded-md
-      `}
+    <span
+      className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md px-2 py-0.5 text-[10px] font-medium sm:text-xs ${variants[safeStatus] || 'bg-gray-100 text-gray-500'}`}
     >
       {formattedStatus}
-    </Badge>
+    </span>
   )
 }
 
@@ -84,77 +72,88 @@ export default function MilestoneCard({ milestone, index, onComplete, onOpen }) 
   const safeStatus = normalizeStatus(milestone.status)
   const router = useRouter()
 
+  const isLocked = safeStatus === 'locked'
+  const isCompleted = safeStatus === 'completed'
 
   const handleNavigate = () => {
-    if (safeStatus === 'locked') return
+    if (isLocked) return
     router.push(`/resource/milestone/${milestone._id}`)
   }
 
-
   return (
-    <div onClick={handleNavigate} className="cursor-pointer">
-    <Card
-      className={`transition-all duration-200 hover:shadow-md ${safeStatus === 'locked' ? 'opacity-60' : 'cursor-pointer'
-        } p-2 sm:p-3 md:p-3`}
-      // onClick={() => {
-      //   if (safeStatus !== 'locked' && onOpen) {
-      //     router.push(`/resource/milestone/${milestone._id}`)
-      //   }
-      // }}
+    <div
+      onClick={handleNavigate}
+      className={`group rounded-xl border p-3 shadow-sm transition-all duration-200 sm:p-4 ${
+        isLocked
+          ? 'cursor-not-allowed border-gray-200 bg-white opacity-60'
+          : isCompleted
+            ? 'cursor-pointer border-green-200 bg-green-50/50 hover:shadow-md'
+            : 'cursor-pointer border-gray-200 bg-white hover:border-[#339999]/60 hover:shadow-md'
+      }`}
     >
-      <CardHeader className="p-0">
-        <div className="flex flex-row sm:items-start gap-2 sm:gap-3">
+      <div className="flex items-start gap-3 sm:gap-4">
 
-          {/* Status Icon */}
-          <div className="flex-shrink-0 flex items-center">
-            <StatusIcon
-              status={safeStatus}
-              onClick={(e) => {
-                e.stopPropagation()
-                if (safeStatus === 'locked') return
-                onComplete()
-              }}
-            />
+        {/* Status toggle */}
+        <button
+          type="button"
+          disabled={isLocked}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (isLocked) return
+            onComplete()
+          }}
+          title={isCompleted ? 'Mark as not completed' : 'Mark as completed'}
+          aria-label={isCompleted ? 'Mark as not completed' : 'Mark as completed'}
+          className="mt-0.5 flex-shrink-0 rounded-full p-1 transition-colors hover:bg-gray-100 disabled:hover:bg-transparent"
+        >
+          <StatusIcon status={safeStatus} />
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <h3
+              className={`text-sm font-semibold sm:text-base ${
+                isCompleted ? 'text-gray-700' : 'text-gray-900'
+              }`}
+            >
+              {index + 1}. {milestone.title}
+            </h3>
+            <StatusBadge status={safeStatus} />
           </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-1 sm:mb-2">
-              <div>
-                <CardTitle className="text-sm sm:text-base md:text-base mb-0.5">
-                  {index + 1}. {milestone.title}
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm md:text-sm text-gray-600">
-                  {milestone.description}
-                </CardDescription>
-              </div>
-              <div className="mt-1 sm:mt-0">
-                <StatusBadge status={safeStatus} />
-              </div>
-            </div>
+          <p className="mt-1 text-xs text-gray-600 sm:text-sm">
+            {milestone.description}
+          </p>
 
-            {/* Details */}
-            <div className="flex flex-wrap gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-gray-500">
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-                {milestone.duration}
-              </div>
+          {/* Details */}
+          {milestone.duration && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 sm:text-sm">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              {milestone.duration}
             </div>
+          )}
 
-            {/* Progress */}
-            {safeStatus === 'in_progress' && milestone.progress != null && (
-              <div className="mt-1 sm:mt-2">
-                <div className="flex justify-between mb-1 text-xs sm:text-sm">
-                  <span>Progress</span>
-                  <span>{milestone.progress}%</span>
-                </div>
-                <Progress value={milestone.progress} className="h-1.5 sm:h-2" />
+          {/* Progress */}
+          {safeStatus === 'in_progress' && milestone.progress != null && (
+            <div className="mt-2">
+              <div className="flex justify-between mb-1 text-xs sm:text-sm">
+                <span>Progress</span>
+                <span>{milestone.progress}%</span>
               </div>
-            )}
-          </div>
+              <Progress
+                value={milestone.progress}
+                className="h-1.5 sm:h-2"
+                indicatorClassName="bg-[#339999]"
+              />
+            </div>
+          )}
         </div>
-      </CardHeader>
-    </Card>
+
+        {!isLocked && (
+          <ChevronRight className="hidden h-5 w-5 flex-shrink-0 self-center text-gray-300 transition-colors group-hover:text-[#339999] sm:block" />
+        )}
+      </div>
     </div>
   )
 }

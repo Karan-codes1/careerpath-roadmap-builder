@@ -1,5 +1,3 @@
-import { Card } from "./ui/card";
-import { Badge } from "./ui/badge";
 import { Clock, BookOpen, Video, FileText, GraduationCap, ExternalLink } from "lucide-react";
 
 export function ResourceItem({ resource }) {
@@ -36,101 +34,88 @@ export function ResourceItem({ resource }) {
     const IconComponent = config.icon;
     const typeColorClass = getTypeColor(resource.type);
     const typeofdifficulty = getDifficultyColor(resource.difficulty);
+    const hasTags = Array.isArray(resource.tags) && resource.tags.length > 0;
 
     return (
-        <Card className="p-4 sm:p-6 hover:shadow-md transition-shadow duration-200">
-            <div className="flex flex-col sm:flex-row items-start gap-3">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-[#339999]/60 hover:shadow-md sm:p-5">
+            <div className="flex items-start gap-3 sm:gap-4">
 
-                {/* Icon (hidden on phones) - Now correctly uses the IconComponent and typeColorClass */}
-                <div className={`hidden sm:flex p-2 rounded-md w-fit ${typeColorClass}`}>
-                    <IconComponent className="w-5 h-5 text-inherit" />
+                {/* Type icon */}
+                <div className={`flex shrink-0 rounded-lg p-1.5 sm:p-2 ${typeColorClass}`}>
+                    <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
 
-                <div className="flex-1 space-y-2 sm:space-y-3">
+                <div className="min-w-0 flex-1 space-y-2">
 
-                    {/* NEW STRUCTURE: Icon, Optional Badge, Title & Type Badge - all aligned */}
-                    <div className="flex items-center gap-1 sm:gap-2">
-                        
-                        {/* Resource Type Icon (Visible ONLY on small screens) */}
-                        <div className={`sm:hidden p-1 rounded-md ${typeColorClass}`}>
-                            <IconComponent className="w-4 h-4 text-inherit" />
-                        </div>
-                        
-                        {/* Optional Badge - Placed before the title */}
-                        {resource.isOptional && (
-                            <Badge variant="outline" className="text-[10px] sm:text-xs text-yellow-700 border-yellow-300 bg-yellow-50">
-                                Optional
-                            </Badge>
-                        )}
-
-                        {/* Title - Uses mr-auto to push the Type Badge to the right */}
-                        <h3 className="font-medium leading-tight text-sm sm:text-base mr-auto">
+                    {/* Title row */}
+                    <div className="flex items-start gap-2">
+                        <h3 className="mr-auto text-sm font-semibold leading-snug text-gray-900 sm:text-base">
                             {resource.title || "Untitled"}
                         </h3>
 
-                        {/* Type Badge - Placed at the end of the line */}
-                        <Badge className={`text-[10px] sm:text-xs rounded-md w-fit flex-shrink-0 ${typeColorClass}`}>
+                        {resource.isOptional && (
+                            <span className="shrink-0 rounded-md border border-yellow-300 bg-yellow-50 px-2 py-0.5 text-[10px] font-medium text-yellow-700 sm:text-xs">
+                                Optional
+                            </span>
+                        )}
+
+                        <span className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium capitalize sm:text-xs ${typeColorClass}`}>
                             {resource.type || "Unknown"}
-                        </Badge>
+                        </span>
                     </div>
 
                     {/* Description */}
                     {resource.description && (
-                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
+                        <p className="text-xs leading-relaxed text-gray-600 sm:text-sm">
                             {resource.description}
                         </p>
                     )}
 
                     {/* Author, Duration, Difficulty */}
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-sm text-muted-foreground">
-                        <span>By {resource.author}</span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 sm:text-sm">
+                        {resource.author && <span>By {resource.author}</span>}
                         {resource.duration && (
-                            <>
-                                <span>•</span>
-                                <div className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                                    <span>{resource.duration}</span>
-                                </div>
-                            </>
+                            <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                {resource.duration}
+                            </span>
                         )}
                         {resource.difficulty && (
-                            <>
-                                <span>•</span>
-                                <Badge className={`text-[10px] sm:text-xs rounded-md w-fit ${typeofdifficulty}`}>
-                                    {resource.difficulty}
-                                </Badge>
-                            </>
+                            <span className={`rounded-md px-2 py-0.5 text-[10px] font-medium capitalize sm:text-xs ${typeofdifficulty}`}>
+                                {resource.difficulty}
+                            </span>
                         )}
                     </div>
 
                     {/* Tags + Link */}
-                    {(Array.isArray(resource.tags) && resource.tags.length > 0) || resource.url ? (
-                        <div className="space-y-1">
-                            {Array.isArray(resource.tags) && resource.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                    {resource.tags.map((tag, index) => (
-                                        <Badge key={index} className="text-[9px] sm:text-xs border border-gray-250">
-                                            {tag}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            )}
+                    {(hasTags || resource.url) && (
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <div className="flex flex-wrap gap-1.5">
+                                {hasTags && resource.tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-medium text-gray-600 sm:text-xs"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
                             {resource.url && (
                                 <a
                                     href={resource.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="inline-flex items-center px-1 py-0.5 sm:px-3 sm:py-1 text-[9px] sm:text-sm font-medium border rounded-md border-gray-300 hover:bg-gray-100 transition-colors"
+                                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:border-[#339999] hover:text-[#267373] sm:text-sm"
                                 >
-                                    <ExternalLink className="w-3 h-3 sm:w-5 sm:h-4 mr-1 sm:mr-2" />
+                                    <ExternalLink className="h-3.5 w-3.5" />
                                     View Resource
                                 </a>
                             )}
                         </div>
-                    ) : null}
+                    )}
                 </div>
             </div>
-        </Card>
+        </div>
     );
 }
